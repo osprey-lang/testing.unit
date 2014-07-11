@@ -22,6 +22,10 @@ public abstract class TestSuite
 	/// Summary: Gets a display name that summarises the tests in the suite.
 	public get name = _name;
 
+	public overridable setUp() { }
+
+	public overridable tearDown() { }
+
 	public run()
 	{
 		return run(false);
@@ -40,13 +44,14 @@ public abstract class TestSuite
 		if not silent:
 			print(">> " :: name);
 
-		var type = typeof(this);
-
 		// Run all public instance methods whose names begin with "test_",
 		// with zero arguments.
 		var i = 0;
 		try
 		{
+			setUp();
+
+			var type = typeof(this);
 			for method in type.getMethods(MSF.isPublic | MSF.isInstance):
 				if method.name.startsWith(namePrefix)
 				{
@@ -71,6 +76,8 @@ public abstract class TestSuite
 		{
 			if not silent:
 				Console.resetColors();
+
+			tearDown();
 		}
 		if not silent:
 			Console.writeLine();

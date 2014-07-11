@@ -1,0 +1,21 @@
+use namespace aves;
+
+namespace testing.unit;
+
+public inheritable AssertionError is Error
+{
+	public new()
+	{
+		new this(defaultMessage, null);
+	}
+	public new(message)
+	{
+		new this(message, null);
+	}
+	public new(message, innerError)
+	{
+		new base(message ?? defaultMessage, null);
+	}
+
+	private const defaultMessage = "Assertion failed.";
+}

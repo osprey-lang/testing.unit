@@ -1,0 +1,112 @@
+use namespace aves;
+use namespace aves.reflection;
+
+namespace testing.unit;
+
+public static class Assert
+{
+	public static isTrue(value, message = null)
+	{
+		if not value:
+			throw new AssertionError(message ?? string(value) :: " should be true");
+	}
+
+	public static isFalse(value, message = null)
+	{
+		if value:
+			throw new AssertionError(message ?? string(value) :: " should be false");
+	}
+
+	public static isNull(value, message = null)
+	{
+		if value is not null:
+			throw new AssertionError(message ?? string(value) :: " should be null");
+	}
+
+	public static isNotNull(value, message = null)
+	{
+		if value is null:
+			throw new AssertionError(message ?? "Value should not be null");
+	}
+
+	public static isEmpty(value, message = null)
+	{
+		areEqual(value.length, 0, message ?? "Collection should be empty");
+	}
+
+	public static isNotEmpty(value, message = null)
+	{
+		areNotEqual(value.length, 0, message ?? "Collection should not be empty");
+	}
+
+	public static throws(type, func, message = null)
+	{
+		if type is not Type:
+			throw new ArgumentError("type must be an aves.Type instance.", "type");
+
+		var error = null;
+		try { func(); }
+		catch AssertionError { throw; } // Always pass on assertion errors
+		catch Error in e { error = e; }
+
+		if error is null:
+			throw new AssertionError(message ?? "Function didn't throw; should have thrown " :: type.fullName);
+		else if not typeof(error).inheritsFrom(type):
+			throw new AssertionError(message ?? "Function should have thrown {0}; actually threw {1}".format([type.fullName, typeof(error).fullName]));
+	}
+
+	public static doesNotThrow(func, message = null)
+	{
+		var error = null;
+		try { func(); }
+		catch AssertionError { throw; } // Always pass on assertion errors
+		catch Error in e { error = e; }
+
+		if error is not null:
+			throw new AssertionError(message ?? "Function should not have thrown; threw " :: typeof(error).fullName);
+	}
+
+	public static areEqual(a, b, message = null)
+	{
+		if a != b:
+			throw new AssertionError(message ?? "{0} should equal {1}".format([a, b]));
+	}
+
+	public static areNotEqual(a, b, message = null)
+	{
+		if a == b:
+			throw new AssertionError(message ?? "{0} should not equal {1}".format([a, b]));
+	}
+
+	public static areSameRef(a, b, message = null)
+	{
+		if a not refeq b:
+			throw new AssertionError(message ?? "{0} should be the same reference as {1}".format([a, b]));
+	}
+
+	public static areNotSameRef(a, b, message = null)
+	{
+		if a refeq b:
+			throw new AssertionError(message ?? "{0} should not be the same reference as {1}".format([a, b]));
+	}
+
+	public static isLess(a, b, message = null)
+	{
+		isTrue(a < b, message ?? "{0} should be less than {1}".format([a, b]));
+	}
+
+	public static isLessOrEqual(a, b, message = null)
+	{
+		isTrue(a <= b, message ?? "{0} should be less than or equal to {1}".format([a, b]));
+	}
+
+	public static isGreater(a, b, message = null)
+	{
+		isTrue(a > b, message ?? "{0} should be greater than {1}".format([a, b]));
+	}
+
+	public static isGreaterOrEqual(a, b, message = null)
+	{
+		isTrue(a >= b, message ?? "{0} should be greater than or equal to {1}".format([a, b]));
+	}
+}

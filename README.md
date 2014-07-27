@@ -86,7 +86,7 @@ failedTests = myClassTests.run(true); // Run and don't print anything
 
 ## Running all test fixtures in a module
 
-The class `testing.unit.TestFixture also has a public static method `runAll`, which can be used to run all test fixtures in a module. The module is given as the first argument to `runAll`, and is an `aves.reflection.Module` instance. The `runAll` method will walk through all the types in the module, and for every type that inherits from `testing.unit.TestFixture`, try to create an instance of the type and run the tests in the fixture.
+The class `testing.unit.TestFixture` also has a public static method `runAll`, which can be used to run all test fixtures in a module. The module is given as the first argument to `runAll`, and is an `aves.reflection.Module` instance. The `runAll` method will walk through all the types in the module, and for every type that inherits from `testing.unit.TestFixture`, try to create an instance of the type and run the tests in the fixture.
 
 Running a module full of test fixtures usually involves no more than this bit of code:
 

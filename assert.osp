@@ -5,44 +5,82 @@ namespace testing.unit;
 
 public static class Assert
 {
+	/// Summary: Verifies that the specified value is true.
+	/// Param value: The value to test.
+	/// Param message: (optional) A message included in the assertion error message.
 	public static isTrue(value, message = null)
 	{
 		if not value:
-			throw new AssertionError(message ?? string(value) :: " should be true");
+			throw new AssertionError(messageExpected(value, "to be true", message));
 	}
 
+	/// Summary: Verifies that the specified value is false.
+	/// Param value: The value to test.
+	/// Param message: (optional) A message included in the assertion error message.
 	public static isFalse(value, message = null)
 	{
 		if value:
-			throw new AssertionError(message ?? string(value) :: " should be false");
+			throw new AssertionError(messageExpected(value, "to be false", message));
 	}
 
+	/// Summary: Verifies that the specified value is null.
+	/// Param value: The value to test.
+	/// Param message: (optional) A message included in the assertion error message.
 	public static isNull(value, message = null)
 	{
 		if value is not null:
-			throw new AssertionError(message ?? string(value) :: " should be null");
+			throw new AssertionError(messageExpected(value, "to be null", message));
 	}
 
+	/// Summary: Verifies that the specified value is not null.
+	/// Param value: The value to test.
+	/// Param message: (optional) A message included in the assertion error message.
 	public static isNotNull(value, message = null)
 	{
 		if value is null:
-			throw new AssertionError(message ?? "Value should not be null");
+			throw new AssertionError(messageExpected(value, "not to be null", message));
 	}
 
+	/// Summary: Verifies that the specified collection is empty. A collection is
+	///          considered to be empty if its `length` property is equal to the
+	///          Int, UInt or Real value 0.
+	/// Param value: The value to test.
+	/// Param message: (optional) A message included in the assertion error message.
+	/// Remarks: This method is usable with all standard collection types, such as
+	///          {List}, {Hash}, {Set} and {String}. Note that {Buffer} has a `size`
+	///          property instead of `length`, and cannot be used with this method.
 	public static isEmpty(value, message = null)
 	{
 		areEqual(value.length, 0, message ?? "Collection should be empty");
 	}
 
+	/// Summary: Verifies that the specified collection is not empty. A collection
+	///          is considered to be empty if its `length` property is equal to the
+	///          Int, UInt or Real value 0.
+	/// Param value: The value to test.
+	/// Param message: (optional) A message included in the assertion error message.
+	/// Remarks: This method is usable with all standard collection types, such as
+	///          {List}, {Hash}, {Set} and {String}. Note that {Buffer} has a `size`
+	///          property instead of `length`, and cannot be used with this method.
 	public static isNotEmpty(value, message = null)
 	{
 		areNotEqual(value.length, 0, message ?? "Collection should not be empty");
 	}
 
+	/// Summary: Verifies that the specified function or callback throws an error
+	///          of the specified type.
+	/// Param type: The error type that should be thrown. (aves.reflection.Type)
+	/// Param func: An invokable value that is called with zero arguments. The
+	///             return value is ignored.
+	/// Param message: (optional) A message included in the assertion error message.
 	public static throws(type, func, message = null)
 	{
 		if type is not Type:
 			throw new ArgumentError("type must be an aves.Type instance.", "type");
+		if not type.inheritsFrom(typeof(Error)):
+			throw new ArgumentError("type must represent aves.Error or a type derived from it.", "type");
+		if func is null:
+			throw new ArgumentNullError("func");
 
 		var error = null;
 		try { func(); }
@@ -50,11 +88,18 @@ public static class Assert
 		catch Error in e { error = e; }
 
 		if error is null:
-			throw new AssertionError(message ?? "Function didn't throw; should have thrown " :: type.fullName);
+			throw new AssertionError("Expected function to throw <{0}>; didn't throw: {1}"
+				.format([type.fullName, message ?? defaultFailureMessage]));
 		else if not typeof(error).inheritsFrom(type):
-			throw new AssertionError(message ?? "Function should have thrown {0}; actually threw {1}".format([type.fullName, typeof(error).fullName]));
+			throw new AssertionError("Expected function to throw <{0}>; threw <{1}> instead: {2}"
+				.format([type.fullName, typeof(error).fullName, message ?? defaultFailureMessage]));
 	}
 
+	/// Summary: Verifies that the specified function ro callback does not throw
+	///          an error.
+	/// Param func: An invokable value that is called with zero arguments. The
+	///             return value is ignored.
+	/// Param message: (optional) A message included in the assertion error message.
 	public static doesNotThrow(func, message = null)
 	{
 		var error = null;
@@ -63,50 +108,117 @@ public static class Assert
 		catch Error in e { error = e; }
 
 		if error is not null:
-			throw new AssertionError(message ?? "Function should not have thrown; threw " :: typeof(error).fullName);
+			throw new AssertionError("Expected function not to throw; threw <{0}>: {1}"
+				.format([typeof(error).fullName, message ?? defaultFailureMessage]));
 	}
 
-	public static areEqual(a, b, message = null)
+	/// Summary: Verifies that two values are equal. The two values are considered equal
+	///          if {actual}’s operator `==` returns true.
+	/// Param actual:   The actual value.
+	/// Param expected: The value that {actual} is expected to equal.
+	/// Param message:  (optional) A message included in the assertion error message.
+	public static areEqual(actual, expected, message = null)
 	{
-		if a != b:
-			throw new AssertionError(message ?? "{0} should equal {1}".format([a, b]));
+		if actual != expected:
+			throw new AssertionError(messageExpected(actual, "to equal", expected, message));
 	}
 
-	public static areNotEqual(a, b, message = null)
+	/// Summary: Verifies that two values are not equal. The two values are considered
+	///          inequal if {actual}’s operator `==` returns false.
+	/// Param actual:   The actual value.
+	/// Param expected: The value that {actual} is expected not to equal.
+	/// Param message:  (optional) A message included in the assertion error message.
+	public static areNotEqual(actual, expected, message = null)
 	{
-		if a == b:
-			throw new AssertionError(message ?? "{0} should not equal {1}".format([a, b]));
+		if actual == expected:
+			throw new AssertionError(messageExpected(actual, "not to equal", expected, message));
 	}
 
-	public static areSameRef(a, b, message = null)
+	/// Summary: Verifies that two values are the same reference, as determined by the
+	///          `refeq` operator.
+	/// Param actual:   The actual value.
+	/// Param expected: The value that {actual} is expected to reference.
+	/// Param message:  (optional) A message included in the assertion error message.
+	public static areSameRef(actual, expected, message = null)
 	{
-		if a not refeq b:
-			throw new AssertionError(message ?? "{0} should be the same reference as {1}".format([a, b]));
+		if actual not refeq expected:
+			throw new AssertionError(messageExpected(actual, "to be the same reference as", expected, message));
 	}
 
-	public static areNotSameRef(a, b, message = null)
+	/// Summary: Verifies that two values are difference references, as determined by the
+	///          `refeq` operator.
+	/// Param actual:   The actual value.
+	/// Param expected: The value that {actual} is expected to differ from.
+	/// Param message:  (optional) A message included in the assertion error message.
+	public static areNotSameRef(actual, expected, message = null)
 	{
-		if a refeq b:
-			throw new AssertionError(message ?? "{0} should not be the same reference as {1}".format([a, b]));
+		if actual refeq expected:
+			throw new AssertionError(messageExpected(actual, "not to be the same reference as", expected, message));
 	}
 
-	public static isLess(a, b, message = null)
+	/// Summary: Verifies that the actual value is less than the expected value. The value
+	///          is considered less if {actual}’s operator `<=>` returns less than zero.
+	/// Param actual:   The actual value.
+	/// Param expected: The value that {actual} is expected be less than.
+	/// Param message:  (optional) A message included in the assertion error message.
+	public static isLess(actual, expected, message = null)
 	{
-		isTrue(a < b, message ?? "{0} should be less than {1}".format([a, b]));
+		if not (actual < expected):
+			throw new AssertionError(messageExpected(actual, "to be less than", expected, message));
 	}
 
-	public static isLessOrEqual(a, b, message = null)
+	/// Summary: Verifies that the actual value is less than or equal to the expected value.
+	///          The value is considered less or equal if {actual}’s operator `<=>` returns
+	///          a value less than or equal to zero.
+	/// Param actual:   The actual value.
+	/// Param expected: The value that {actual} is expected be less than or equal to.
+	/// Param message:  (optional) A message included in the assertion error message.
+	public static isLessOrEqual(actual, expected, message = null)
 	{
-		isTrue(a <= b, message ?? "{0} should be less than or equal to {1}".format([a, b]));
+		if not (actual <= expected):
+			throw new AssertionError(messageExpected(actual, "to be less than or equal to", expected, message));
 	}
 
-	public static isGreater(a, b, message = null)
+	/// Summary: Verifies that the actual value is greater than the expected value. The value
+	///          is considered greater if {actual}’s operator `<=>` returns greater than zero.
+	/// Param actual:   The actual value.
+	/// Param expected: The value that {actual} is expected be greater than.
+	/// Param message:  (optional) A message included in the assertion error message.
+	public static isGreater(actual, expected, message = null)
 	{
-		isTrue(a > b, message ?? "{0} should be greater than {1}".format([a, b]));
+		if not (actual > expected):
+			throw new AssertionError(messageExpected(actual, "to be greater than", expected, message));
 	}
 
-	public static isGreaterOrEqual(a, b, message = null)
+	/// Summary: Verifies that the actual value is greater than or equal to the expected value.
+	///          The value is considered greater or equal if {actual}’s operator `<=>` returns
+	///          a value greater than or equal to zero.
+	/// Param actual:   The actual value.
+	/// Param expected: The value that {actual} is expected be greater than or equal to.
+	/// Param message:  (optional) A message included in the assertion error message.
+	public static isGreaterOrEqual(actual, expected, message = null)
 	{
-		isTrue(a >= b, message ?? "{0} should be greater than or equal to {1}".format([a, b]));
+		if not (actual >= expected):
+			throw new AssertionError(messageExpected(actual, "to be greater than or equal to", expected, message));
 	}
+
+	private static messageExpected(actual, expectation, failureMessage)
+	{
+		return singleArgMessage.format([actual,
+			expectation,
+			failureMessage ?? defaultFailureMessage]);
+	}
+	private static messageExpected(actual, expectation, expected, failureMessage)
+	{
+		return twoArgMessage.format([actual,
+			expectation,
+			expected,
+			failureMessage ?? defaultFailureMessage]);
+	}
+
+	// 0 = expectation; 1 = actual value; 2 = failure message
+	private const singleArgMessage = "Expected <{0}> {1}: {2}";
+	// 0 = expectation; 1 = actual value; 2 = expected value; 3 = failure message
+	private const twoArgMessage = "Expected <{0}> {1} <{2}>: {3}";
+	private const defaultFailureMessage = "Assertion failed";
 }

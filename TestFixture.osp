@@ -1,0 +1,174 @@
+use namespace aves;
+use namespace aves.reflection;
+use MSF = aves.reflection.MemberSearchFlags;
+
+namespace testing.unit;
+
+/// Summary: The abstract base class for test fixtures. Classes derived from TestFixture
+///          can be run as part of a unit test suite. All parameterless functions whose
+///          names start with `test_` are considered test cases, and are run when the
+///          {run} or {runAll} method is invoked.
+public abstract class TestFixture
+{
+	/// Summary: Initializes the test fixture with no name.
+	public new()
+	{
+		new this(null);
+	}
+	/// Summary: Initializes the test fixture with the specified name.
+	/// Param name: A display name that summarises the tests in the fixture.
+	public new(name)
+	{
+		_name = name?.toString() ?? defaultName;
+	}
+
+	private _name;
+	/// Summary: Gets a display name that summarises the tests in the fixture.
+	public get name = _name;
+
+	/// Summary: When overridden in a derived class, provides a setup routine
+	///          that is called before each test case.
+	public overridable setUp() { }
+
+	/// Summary: When overridden in a derived class, provides a teardown routine
+	///          that is called after each run test, even if the test fails.
+	public overridable tearDown() { }
+
+	/// Summary: Runs this test fixture, printing the results to the console.
+	/// Returns: A List containing zero or more {FailedTest} instances.
+	public run()
+	{
+		return run(false);
+	}
+	/// Summary: Runs this test fixture, optionally suppressing the printing
+	///          of results to the console.
+	/// Param silent: If true, no output is printed to the console.
+	public run(silent)
+	{
+		var failedTests = [];
+		runInternal(failedTests, silent);
+		if not silent:
+			printFailedTests(failedTests, false);
+		return failedTests;
+	}
+
+	private runInternal(failedTests, silent)
+	{
+		if not silent:
+			print(">> " :: name);
+
+		// Run all public instance methods whose names begin with "test_",
+		// with zero arguments.
+		var i = 0;
+		try
+		{
+			var type = typeof(this);
+			for method in type.getMethods(MSF.isPublic | MSF.isInstance):
+				if method.name.startsWith(namePrefix)
+				{
+					var err = runSingleTest(method);
+					if err:
+						failedTests.add(new FailedTest(i, method.name.substr(namePrefix.length), err, this));
+					if not silent:
+						if err
+						{
+							Console.textColor = ConsoleColor.red;
+							Console.write("F");
+						}
+						else
+						{
+							Console.textColor = ConsoleColor.green;
+							Console.write(".");
+						}
+					i += 1;
+				}
+		}
+		finally
+		{
+			if not silent:
+				Console.resetColors();
+		}
+		if not silent:
+			Console.writeLine();
+	}
+
+	// Runs a single test method.
+	private runSingleTest(method)
+	{
+		try
+		{
+			// Call setup before each test
+			setUp();
+			// Call method on 'this' with zero arguments
+			method.invoke(this, null);
+		}
+		catch Error in e
+		{
+			// Assertion errors are filtered out later
+			return e;
+		}
+		finally
+		{
+			// Clean up after test
+			tearDown();
+		}
+		return null; // no error
+	}
+
+	/// Summary: Runs all tests fixtures in the specified module. The result of
+	///          the test run is printed to the console.
+	/// Param module: The module to run tests for. (aves.reflection.Module)
+	public static runAll(module)
+	{
+		if module is not Module:
+			throw new TypeError("module must be an aves.reflection.Module.");
+
+		var failedTests = [];
+
+		var testFixtureType = typeof(TestFixture);
+		for type in module.getTypes(MSF.isPublic | MSF.isStatic):
+			if type.inheritsFrom(testFixtureType)
+			{
+				var fixture;
+				try
+				{
+					fixture = type.createInstance(null);
+				}
+				catch Error in e
+				{
+					print(">> Test fixture error: '{0}': {1}",
+						[type.fullName, e]);
+				}
+				if fixture is not null:
+					fixture.runInternal(failedTests, false);
+			}
+
+		printFailedTests(failedTests, true);
+	}
+
+	private static printFailedTests(failedTests, includeFixture)
+	{
+		if not failedTests.isEmpty
+		{
+			print("\nFailed tests:");
+			for failure in failedTests
+			{
+				var error = failure.error;
+				var msg = error.message;
+				if error is not AssertionError:
+					msg = typeof(error).fullName :: ": " :: msg;
+				print(includeFixture ? failedTestWithFixtureFormat : failedTestFormat,
+					[failure.index, failure.name, msg, error.stackTrace, failure.fixture.name]);
+			}
+		}
+	}
+
+	// The default name for a test fixture initialized without a name.
+	private const defaultName = "(unnamed)";
+	// The prefix used for test cases.
+	private const namePrefix = "test_";
+	// 0 = test index; 1 = test name; 2 = failure message; 3 = stack trace
+	private const failedTestFormat = "[{0}: {1}] {2}\n{3}";
+	// 4 = fixture name
+	private const failedTestWithFixtureFormat = "[{4} #{0}: {1}] {2}\n{3}";
+}

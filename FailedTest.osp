@@ -1,0 +1,58 @@
+use namespace aves;
+
+namespace testing.unit;
+
+/// Summary: Represents a single failed test in a test fixture.
+public class FailedTest
+{
+	/// Summary: Creates a new {FailedTest} with the specified data.
+	/// Param index:   The index of the test that failed. (Int, UInt or Real)
+	/// Param name:    The name of the test that failed.
+	/// Param error:   The error that was thrown, causing the test to fail.
+	/// Param fixture: The test fixture that contains the test that failed.
+	/// Throws TypeError:
+	///          {index} could not be converted to an Int.
+	///
+	///          {name} could not be converted to a String.
+	/// Throws ArgumentNullError:
+	///          {error} or {fixture} is null.
+	/// Throws ArgumentError:
+	///          {error} is not an instance of {aves.Error}.
+	public new(index, name, error, fixture)
+	{
+		index = int(index);
+		name = string(name);
+		if error is null:
+			throw new ArgumentNullError("error");
+		if error is not Error:
+			throw new ArgumentError("error must be an instance of aves.Error", "error");
+		if fixture is null:
+			throw new ArgumentNullError("fixture");
+
+		_index = index;
+		_name = name;
+		_error = error;
+		_fixture = fixture;
+	}
+
+	private _index;
+	/// Summary: Gets the zero-based index of the test that failed, as an Int.
+	/// Remarks: Test cases are run in an unspecified order, because the methods
+	///          in a class are returned in an unspecified order. Therefore, this
+	///          value may not be useful, especially not between test runs.
+	public get index = _index;
+
+	private _name;
+	/// Summary: Gets the name of the test that failed, as a String. This value
+	///          corresponds to the name of the method without the `test_` prefix.
+	public get name = _name;
+
+	private _error;
+	/// Summary: Gets the {Error} instance that was thrown in the test case,
+	///          causing it to fail.
+	public get error = _error;
+
+	private _fixture;
+	/// Summary: Gets the {TestFixture} instance that contains the failed test.
+	public get fixture = _fixture;
+}

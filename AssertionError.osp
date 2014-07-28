@@ -14,7 +14,7 @@ public inheritable AssertionError is Error
 	}
 	public new(message, innerError)
 	{
-		new base(message ?? defaultMessage, null);
+		new base(message ?? defaultMessage, innerError);
 	}
 
 	private const defaultMessage = "Assertion failed.";

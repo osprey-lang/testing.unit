@@ -157,8 +157,14 @@ public abstract class TestFixture
 				var msg = error.message;
 				if error is not AssertionError:
 					msg = typeof(error).fullName :: ": " :: msg;
+				// First print some general information
 				print(includeFixture ? failedTestWithFixtureFormat : failedTestFormat,
-					[failure.index, failure.name, msg, error.stackTrace, failure.fixture.name]);
+					[failure.index, failure.name, msg, failure.fixture.name]);
+				// Then the stack trace of the "main" error
+				print(error.stackTrace);
+				// Followed by the innerError chain as far as it goes.
+				while error = error.innerError:
+					print("Inner error: " :: error);
 			}
 		}
 	}
@@ -167,8 +173,8 @@ public abstract class TestFixture
 	private const defaultName = "(unnamed)";
 	// The prefix used for test cases.
 	private const namePrefix = "test_";
-	// 0 = test index; 1 = test name; 2 = failure message; 3 = stack trace
-	private const failedTestFormat = "[{0}: {1}] {2}\n{3}";
-	// 4 = fixture name
-	private const failedTestWithFixtureFormat = "[{4} #{0}: {1}] {2}\n{3}";
+	// 0 = test index; 1 = test name; 2 = failure message
+	private const failedTestFormat = "[{0}: {1}] {2}";
+	// 3 = fixture name
+	private const failedTestWithFixtureFormat = "[{3} #{0}: {1}] {2}";
 }

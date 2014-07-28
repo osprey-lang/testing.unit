@@ -89,10 +89,12 @@ public static class Assert
 
 		if error is null:
 			throw new AssertionError("Expected function to throw <{0}>; didn't throw: {1}"
-				.format([type.fullName, message ?? defaultFailureMessage]));
+				.format([type.fullName, message ?? defaultFailureMessage]),
+				error); // innerError
 		else if not typeof(error).inheritsFrom(type):
 			throw new AssertionError("Expected function to throw <{0}>; threw <{1}> instead: {2}"
-				.format([type.fullName, typeof(error).fullName, message ?? defaultFailureMessage]));
+				.format([type.fullName, typeof(error).fullName, message ?? defaultFailureMessage]),
+				error); // innerError
 	}
 
 	/// Summary: Verifies that the specified function ro callback does not throw
@@ -109,7 +111,8 @@ public static class Assert
 
 		if error is not null:
 			throw new AssertionError("Expected function not to throw; threw <{0}>: {1}"
-				.format([typeof(error).fullName, message ?? defaultFailureMessage]));
+				.format([typeof(error).fullName, message ?? defaultFailureMessage]),
+				error); // innerError
 	}
 
 	/// Summary: Verifies that two values are equal. The two values are considered equal

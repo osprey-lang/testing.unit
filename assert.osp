@@ -8,6 +8,8 @@ public static class Assert
 	/// Summary: Verifies that the specified value is true.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {value} is a falsy value.
 	public static isTrue(value, message = null)
 	{
 		if not value:
@@ -17,6 +19,8 @@ public static class Assert
 	/// Summary: Verifies that the specified value is false.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {value} is a truthy value.
 	public static isFalse(value, message = null)
 	{
 		if value:
@@ -26,6 +30,8 @@ public static class Assert
 	/// Summary: Verifies that the specified value is null.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {value} is not null.
 	public static isNull(value, message = null)
 	{
 		if value is not null:
@@ -35,6 +41,8 @@ public static class Assert
 	/// Summary: Verifies that the specified value is not null.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {value} is null.
 	public static isNotNull(value, message = null)
 	{
 		if value is null:
@@ -46,6 +54,8 @@ public static class Assert
 	///          Int, UInt or Real value 0.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {value}’s `length` property did not return zero.
 	/// Remarks: This method is usable with all standard collection types, such as
 	///          {List}, {Hash}, {Set} and {String}. Note that {Buffer} has a `size`
 	///          property instead of `length`, and cannot be used with this method.
@@ -59,12 +69,31 @@ public static class Assert
 	///          Int, UInt or Real value 0.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {value}’s `length` property returned zero.
 	/// Remarks: This method is usable with all standard collection types, such as
 	///          {List}, {Hash}, {Set} and {String}. Note that {Buffer} has a `size`
 	///          property instead of `length`, and cannot be used with this method.
 	public static isNotEmpty(value, message = null)
 	{
 		areNotEqual(value.length, 0, message ?? "Collection should not be empty");
+	}
+
+	/// Summary: Verifies that the specified value is of the specified type.
+	/// Param value: The value to test.
+	/// Param type: The type that {value} has to be of. (aves.reflection.Type)
+	/// Throws ArgumentError:
+	///          {type} is not an instance of {aves.reflection.Type}.
+	/// Throws AssertionError:
+	///          {value} is not an instance of the type represented by {type}.
+	public static isOfType(value, type, message = null)
+	{
+		if type is not Type:
+			throw new ArgumentError("type must be an aves.reflection.Type instances.", "type");
+
+		if not typeof(value).inheritsFrom(type):
+			throw new AssertionError("Expected <{0}> to be of type <{1}>; was <{2}> instead: {3}"
+				.format([value, type.fullName, typeof(value).fullName, message ?? defaultFailureMessage]));
 	}
 
 	/// Summary: Verifies that the specified function or callback throws an error
@@ -74,10 +103,20 @@ public static class Assert
 	///             return value is ignored.
 	/// Param message: (optional) A message included in the assertion error message.
 	/// Returns: The error that was thrown, for further inspection if necessary.
+	/// Throws ArgumentError:
+	///          {type} is not an instance of {aves.reflection.Type}, or the type represented
+	///          by {type} is not {aves.Error} or a type derived from it.
+	/// Throws ArgumentNullError:
+	///          {func} is null.
+	/// Throws AssertionError:
+	///          {func} did not throw an error when invoked with zero arguments, or did not
+	///          throw an error of the type {type}.
+	/// Remarks: If {func} throws an {AssertionError}, it is passed to the caller of this
+	///          method with no modification.
 	public static throws(type, func, message = null)
 	{
 		if type is not Type:
-			throw new ArgumentError("type must be an aves.Type instance.", "type");
+			throw new ArgumentError("type must be an aves.reflection.Type instance.", "type");
 		if not type.inheritsFrom(typeof(Error)):
 			throw new ArgumentError("type must represent aves.Error or a type derived from it.", "type");
 		if func is null:
@@ -99,13 +138,22 @@ public static class Assert
 		return error;
 	}
 
-	/// Summary: Verifies that the specified function ro callback does not throw
+	/// Summary: Verifies that the specified function or callback does not throw
 	///          an error.
 	/// Param func: An invokable value that is called with zero arguments. The
 	///             return value is ignored.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Throws ArgumentNullError:
+	///          {func} is null.
+	/// Throws AssertionError:
+	///          {func} threw an error when invoked with zero arguments.
+	/// Remarks: If {func} throws an {AssertionError}, it is passed to the caller of this
+	///          method with no modification.
 	public static doesNotThrow(func, message = null)
 	{
+		if func is null:
+			throw new ArgumentNullError("func");
+
 		var error = null;
 		try { func(); }
 		catch AssertionError { throw; } // Always pass on assertion errors
@@ -122,6 +170,8 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected to equal.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {actual} is not equal to {expected} according to the `==` operator.
 	public static areEqual(actual, expected, message = null)
 	{
 		if actual != expected:
@@ -133,6 +183,8 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected not to equal.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {actual} is equal to {expected} according to the `==` operator.
 	public static areNotEqual(actual, expected, message = null)
 	{
 		if actual == expected:
@@ -144,6 +196,8 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected to reference.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {actual} is not the same reference as {expected}.
 	public static areSameRef(actual, expected, message = null)
 	{
 		if actual not refeq expected:
@@ -155,6 +209,8 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected to differ from.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {actual} is the same reference as {expected}.
 	public static areNotSameRef(actual, expected, message = null)
 	{
 		if actual refeq expected:
@@ -166,6 +222,8 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected be less than.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {actual} is not less than {expected}.
 	public static isLess(actual, expected, message = null)
 	{
 		if not (actual < expected):
@@ -178,6 +236,8 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected be less than or equal to.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {actual} is not less than nor equal to {expected}.
 	public static isLessOrEqual(actual, expected, message = null)
 	{
 		if not (actual <= expected):
@@ -189,6 +249,8 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected be greater than.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {actual} is not greater than {expected}.
 	public static isGreater(actual, expected, message = null)
 	{
 		if not (actual > expected):
@@ -201,6 +263,8 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected be greater than or equal to.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Throws AssertionError:
+	///          {actual} is not greater than nor equal to {expected}.
 	public static isGreaterOrEqual(actual, expected, message = null)
 	{
 		if not (actual >= expected):

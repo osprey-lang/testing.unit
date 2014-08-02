@@ -73,6 +73,7 @@ public static class Assert
 	/// Param func: An invokable value that is called with zero arguments. The
 	///             return value is ignored.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: The error that was thrown, for further inspection if necessary.
 	public static throws(type, func, message = null)
 	{
 		if type is not Type:
@@ -95,6 +96,7 @@ public static class Assert
 			throw new AssertionError("Expected function to throw <{0}>; threw <{1}> instead: {2}"
 				.format([type.fullName, typeof(error).fullName, message ?? defaultFailureMessage]),
 				error); // innerError
+		return error;
 	}
 
 	/// Summary: Verifies that the specified function ro callback does not throw
@@ -219,9 +221,9 @@ public static class Assert
 			failureMessage ?? defaultFailureMessage]);
 	}
 
-	// 0 = expectation; 1 = actual value; 2 = failure message
+	// 0 = actual value; 1 = expectation phrase; 2 = failure message
 	private const singleArgMessage = "Expected <{0}> {1}: {2}";
-	// 0 = expectation; 1 = actual value; 2 = expected value; 3 = failure message
+	// 0 = actual value; 1 = expectation phrase; 2 = expected value; 3 = failure message
 	private const twoArgMessage = "Expected <{0}> {1} <{2}>: {3}";
 	private const defaultFailureMessage = "Assertion failed";
 }

@@ -136,7 +136,7 @@ public abstract class TestFixture
 				}
 				catch Error in e
 				{
-					print(">> Test fixture error: '{0}': {1}",
+					print(">> Test fixture initialization error: '{0}': {1}",
 						[type.fullName, e]);
 				}
 				if fixture is not null:

@@ -99,13 +99,15 @@ public abstract class TestFixture
 		{
 			// Call setup before each test
 			setUp();
-			// Call method on 'this' with zero arguments
-			method.invoke(this, null);
-		}
-		catch Error in e
-		{
-			// Assertion errors are filtered out later
-			return e;
+			try {
+				// Call method on 'this' with zero arguments
+				method.invoke(this, null);
+			}
+			catch Error in e
+			{
+				// Assertion errors are filtered out later
+				return e;
+			}
 		}
 		finally
 		{
@@ -139,8 +141,7 @@ public abstract class TestFixture
 					print(">> Test fixture initialization error: '{0}': {1}",
 						[type.fullName, e]);
 				}
-				if fixture is not null:
-					fixture.runInternal(failedTests, false);
+				fixture?.runInternal(failedTests, false);
 			}
 
 		printFailedTests(failedTests, true);

@@ -8,45 +8,53 @@ public static class Assert
 	/// Summary: Verifies that the specified value is true.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {value} is a falsy value.
 	public static isTrue(value, message = null)
 	{
 		if not value:
 			throw new AssertionError(messageExpected(value, "to be true", message));
+		return true;
 	}
 
 	/// Summary: Verifies that the specified value is false.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {value} is a truthy value.
 	public static isFalse(value, message = null)
 	{
 		if value:
 			throw new AssertionError(messageExpected(value, "to be false", message));
+		return true;
 	}
 
 	/// Summary: Verifies that the specified value is null.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {value} is not null.
 	public static isNull(value, message = null)
 	{
 		if value is not null:
 			throw new AssertionError(messageExpected(value, "to be null", message));
+		return true;
 	}
 
 	/// Summary: Verifies that the specified value is not null.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {value} is null.
 	public static isNotNull(value, message = null)
 	{
 		if value is null:
 			throw new AssertionError(messageExpected(value, "not to be null", message));
+		return true;
 	}
 
 	/// Summary: Verifies that the specified collection is empty. A collection is
@@ -54,6 +62,7 @@ public static class Assert
 	///          Int, UInt or Real value 0.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {value}’s `length` property did not return zero.
 	/// Remarks: This method is usable with all standard collection types, such as
@@ -61,7 +70,7 @@ public static class Assert
 	///          property instead of `length`, and cannot be used with this method.
 	public static isEmpty(value, message = null)
 	{
-		areEqual(value.length, 0, message ?? "Collection should be empty");
+		return areEqual(value.length, 0, message ?? "Collection should be empty");
 	}
 
 	/// Summary: Verifies that the specified collection is not empty. A collection
@@ -69,6 +78,7 @@ public static class Assert
 	///          Int, UInt or Real value 0.
 	/// Param value: The value to test.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {value}’s `length` property returned zero.
 	/// Remarks: This method is usable with all standard collection types, such as
@@ -76,12 +86,13 @@ public static class Assert
 	///          property instead of `length`, and cannot be used with this method.
 	public static isNotEmpty(value, message = null)
 	{
-		areNotEqual(value.length, 0, message ?? "Collection should not be empty");
+		return areNotEqual(value.length, 0, message ?? "Collection should not be empty");
 	}
 
 	/// Summary: Verifies that the specified value is of the specified type.
 	/// Param value: The value to test.
 	/// Param type: The type that {value} has to be of. (aves.reflection.Type)
+	/// Returns: True if the assertion succeeds.
 	/// Throws ArgumentError:
 	///          {type} is not an instance of {aves.reflection.Type}.
 	/// Throws AssertionError:
@@ -94,6 +105,8 @@ public static class Assert
 		if not typeof(value).inheritsFrom(type):
 			throw new AssertionError("Expected <{0}> to be of type <{1}>; was <{2}> instead: {3}"
 				.format([value, type.fullName, typeof(value).fullName, message ?? defaultFailureMessage]));
+
+		return true;
 	}
 
 	/// Summary: Verifies that the specified function or callback throws an error
@@ -143,6 +156,7 @@ public static class Assert
 	/// Param func: An invokable value that is called with zero arguments. The
 	///             return value is ignored.
 	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws ArgumentNullError:
 	///          {func} is null.
 	/// Throws AssertionError:
@@ -163,6 +177,7 @@ public static class Assert
 			throw new AssertionError("Expected function not to throw; threw <{0}>: {1}"
 				.format([typeof(error).fullName, message ?? defaultFailureMessage]),
 				error); // innerError
+		return true;
 	}
 
 	/// Summary: Verifies that two values are equal. The two values are considered equal
@@ -170,12 +185,14 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected to equal.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {actual} is not equal to {expected} according to the `==` operator.
 	public static areEqual(actual, expected, message = null)
 	{
 		if actual != expected:
 			throw new AssertionError(messageExpected(actual, "to equal", expected, message));
+		return true;
 	}
 
 	/// Summary: Verifies that two values are not equal. The two values are considered
@@ -183,12 +200,14 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected not to equal.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {actual} is equal to {expected} according to the `==` operator.
 	public static areNotEqual(actual, expected, message = null)
 	{
 		if actual == expected:
 			throw new AssertionError(messageExpected(actual, "not to equal", expected, message));
+		return true;
 	}
 
 	/// Summary: Verifies that two values are the same reference, as determined by the
@@ -196,12 +215,14 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected to reference.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {actual} is not the same reference as {expected}.
 	public static areSameRef(actual, expected, message = null)
 	{
 		if actual not refeq expected:
 			throw new AssertionError(messageExpected(actual, "to be the same reference as", expected, message));
+		return true;
 	}
 
 	/// Summary: Verifies that two values are difference references, as determined by the
@@ -209,12 +230,14 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected to differ from.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {actual} is the same reference as {expected}.
 	public static areNotSameRef(actual, expected, message = null)
 	{
 		if actual refeq expected:
 			throw new AssertionError(messageExpected(actual, "not to be the same reference as", expected, message));
+		return true;
 	}
 
 	/// Summary: Verifies that the actual value is less than the expected value. The value
@@ -222,12 +245,14 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected be less than.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {actual} is not less than {expected}.
 	public static isLess(actual, expected, message = null)
 	{
 		if not (actual < expected):
 			throw new AssertionError(messageExpected(actual, "to be less than", expected, message));
+		return true;
 	}
 
 	/// Summary: Verifies that the actual value is less than or equal to the expected value.
@@ -236,12 +261,14 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected be less than or equal to.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {actual} is not less than nor equal to {expected}.
 	public static isLessOrEqual(actual, expected, message = null)
 	{
 		if not (actual <= expected):
 			throw new AssertionError(messageExpected(actual, "to be less than or equal to", expected, message));
+		return true;
 	}
 
 	/// Summary: Verifies that the actual value is greater than the expected value. The value
@@ -249,12 +276,14 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected be greater than.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {actual} is not greater than {expected}.
 	public static isGreater(actual, expected, message = null)
 	{
 		if not (actual > expected):
 			throw new AssertionError(messageExpected(actual, "to be greater than", expected, message));
+		return true;
 	}
 
 	/// Summary: Verifies that the actual value is greater than or equal to the expected value.
@@ -263,26 +292,89 @@ public static class Assert
 	/// Param actual:   The actual value.
 	/// Param expected: The value that {actual} is expected be greater than or equal to.
 	/// Param message:  (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
 	/// Throws AssertionError:
 	///          {actual} is not greater than nor equal to {expected}.
 	public static isGreaterOrEqual(actual, expected, message = null)
 	{
 		if not (actual >= expected):
 			throw new AssertionError(messageExpected(actual, "to be greater than or equal to", expected, message));
+		return true;
+	}
+
+	/// Summary: Compares each item from a collection with each corresponding item from another
+	///          collection, using the specified comparer callback. The collections must have the
+	///          same length, and the predicate must return a truthy value for each pair of values,
+	///          otherwise the assertion fails.
+	/// Param first: The first collection to compare. This value must implement a finite iterator.
+	/// Param second: The second collection to compare. This value must implement a finite iterator.
+	/// Param comparer: An invokable value that is called with two arguments. Each argument is a
+	///          value from {first} and {second}, respectively. If the values match, the comparer
+	///          returns a truthy value; otherwise, it may return a falsy value or throw an error.
+	/// Param message: (optional) A message included in the assertion error message.
+	/// Returns: True if the assertion succeeds.
+	/// Throws AssertionError:
+	///          The two collections do not match, or one collection is longer than the other.
+	/// Remarks: The assertion succeeds if both collections are empty.
+	///
+	///          To test whether two collections contain the same values, you can do something
+	///          like the following:
+	///
+	///          `Assert.collectionsMatch(first, second, Assert.areEqual);`
+	///
+	///          or:
+	///
+	///          `Assert.collectionsMatch(first, second, Assert.areSameRef);`
+	///
+	///          or even just:
+	///
+	///          `Assert.collectionsMatch(first, second, @==);`
+	public static collectionsMatch(first, second, comparer, message = null)
+	{
+		var firstIter = first.iter;
+		var secondIter = second.iter;
+
+		while true
+		{
+			var firstHasMore = firstIter.moveNext();
+			var secondHasMore = secondIter.moveNext();
+			if firstHasMore != secondHasMore:
+				throw new AssertionError(
+					"Expected the two collections to have the same length: " :: (message ?? defaultFailureMessage)
+				);
+
+			// firstHasMore == secondHasMore here
+			if not firstHasMore:
+				break;
+
+			var match = comparer(firstIter.current, secondIter.current);
+			if not match:
+				throw new AssertionError("<{0}> did not match <{1}>: {2}".format([
+					firstIter.current,
+					secondIter.current,
+					message ?? defaultFailureMessage
+				]));
+		}
+
+		return true;
 	}
 
 	private static messageExpected(actual, expectation, failureMessage)
 	{
-		return singleArgMessage.format([actual,
+		return singleArgMessage.format([
+			actual,
 			expectation,
-			failureMessage ?? defaultFailureMessage]);
+			failureMessage ?? defaultFailureMessage
+		]);
 	}
 	private static messageExpected(actual, expectation, expected, failureMessage)
 	{
-		return twoArgMessage.format([actual,
+		return twoArgMessage.format([
+			actual,
 			expectation,
 			expected,
-			failureMessage ?? defaultFailureMessage]);
+			failureMessage ?? defaultFailureMessage
+		]);
 	}
 
 	// 0 = actual value; 1 = expectation phrase; 2 = failure message

@@ -103,8 +103,14 @@ public static class Assert
 			throw new ArgumentError("type must be an aves.reflection.Type instances.", "type");
 
 		if not typeof(value).inheritsFrom(type):
-			throw new AssertionError("Expected <{0}> to be of type <{1}>; was <{2}> instead: {3}"
-				.format([value, type.fullName, typeof(value).fullName, message ?? defaultFailureMessage]));
+			throw new AssertionError(
+				"Expected <{0}> to be of type <{1}>; was <{2}> instead: {3}".format([
+						value,
+						type.fullName,
+						typeof(value).fullName,
+						message ?? defaultFailureMessage
+					])
+			);
 
 		return true;
 	}
@@ -141,13 +147,22 @@ public static class Assert
 		catch Error in e { error = e; }
 
 		if error is null:
-			throw new AssertionError("Expected function to throw <{0}>; didn't throw: {1}"
-				.format([type.fullName, message ?? defaultFailureMessage]),
-				error); // innerError
+			throw new AssertionError(
+				"Expected function to throw <{0}>; didn't throw: {1}".format([
+					type.fullName,
+					message ?? defaultFailureMessage
+				]),
+				error // innerError
+			);
 		else if not typeof(error).inheritsFrom(type):
-			throw new AssertionError("Expected function to throw <{0}>; threw <{1}> instead: {2}"
-				.format([type.fullName, typeof(error).fullName, message ?? defaultFailureMessage]),
-				error); // innerError
+			throw new AssertionError(
+				"Expected function to throw <{0}>; threw <{1}> instead: {2}".format([
+					type.fullName,
+					typeof(error).fullName,
+					message ?? defaultFailureMessage
+				]),
+				error // innerError
+			);
 		return error;
 	}
 
@@ -174,9 +189,13 @@ public static class Assert
 		catch Error in e { error = e; }
 
 		if error is not null:
-			throw new AssertionError("Expected function not to throw; threw <{0}>: {1}"
-				.format([typeof(error).fullName, message ?? defaultFailureMessage]),
-				error); // innerError
+			throw new AssertionError(
+				"Expected function not to throw; threw <{0}>: {1}".format([
+					typeof(error).fullName,
+					message ?? defaultFailureMessage
+				]),
+				error // innerError
+			);
 		return true;
 	}
 

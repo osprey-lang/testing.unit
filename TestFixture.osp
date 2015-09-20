@@ -69,7 +69,7 @@ public abstract class TestFixture
 				{
 					var err = runSingleTest(method);
 					if err:
-						failedTests.add(new FailedTest(i, method.name.substr(namePrefix.length), err, this));
+						failedTests.add(new FailedTest(i, method.name.substring(namePrefix.length), err, this));
 					if not silent
 					{
 						if err

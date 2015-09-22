@@ -1,14 +1,14 @@
-The module `testing.unit` is a tiny, extremely basic unit testing module for Osprey. It is extremely barebones at the moment, capable only of what is absolutely necessary for running a series of unit tests.
+The module `testing.unit` is a tiny and basic unit testing module for Osprey. It is extremely barebones at the moment, capable only of what is absolutely necessary for running a series of unit tests.
 
 All members exported by this module are in the namespace `testing.unit`.
 
-Unit tests are organised into test fixtures. Each test fixture defines zero or more tests cases, which in turn may involve any number of test conditions (usually in the form of assertions).
+Unit tests are organised into test fixtures. Each test fixture defines zero or more tests cases, which are methods that may involve any number of test conditions, usually in the form of assertions.
 
 ## Defining a test fixture
 
-To define a test fixture, you declare a class that derives from `testing.unit.TestFixture`, which is an abstract class. In order to be usable with `testing.unit`, your test fixture class must define a public constructor that accepts zero arguments.
+To define a test fixture, declare a class that derives from the abstract class `testing.unit.TestFixture`. In order to be usable with `testing.unit`, your test fixture class must define a public constructor that accepts zero arguments.
 
-Then, you define your tests as methods on the test fixture class. Every public instance method whose name begins with “`test_`” is part of the test fixture, and like the constructor, must accept zero arguments. An example follows.
+Then, define your tests as methods on the test fixture class. Every public instance method whose name begins with “`test_`” is part of the test fixture, and like the constructor, must accept zero arguments. An example follows.
 
 ```
 use namespace aves;
@@ -29,15 +29,15 @@ public class MyClassTests is TestFixture
 	{
 		var myClass;
 		// testing.unit.Assert is a helper class
-		Assert.doesNotThrow(@ { myClass = new MyClass(); });
+		Assert.doesNotThrow(@{ myClass = new MyClass(); });
 		Assert.areEqual(myClass.value, 0);
 		// etc.
 	}
 
 	public test_ConstructionWithOneArgument()
 	{
-		var value = 123;
 		var myClass;
+		var value = 123;
 		Assert.doesNotThrow(@{ myClass = new MyClass(value); });
 		Assert.areEqual(myClass.value, value);
 	}
@@ -49,40 +49,21 @@ public class MyClassTests is TestFixture
 
 	public test_Equality()
 	{
-		// Manual throwing of AssertionError
+		// Assertion errors can be thrown explicitly:
 		var x = new MyClass(1);
 		var y = new MyClass(1);
 		if x != y:
 			throw new AssertionError("MyClass with same value should equal each other.");
+
 		// Usually better:
-		//Assert.areEqual(x, y);
+		Assert.areEqual(x, y, "MyClass with same value should equal each other.");
 	}
 
 	// etc.
 }
 ```
 
-In the test methods, the part of the name following “`test_`” is displayed (without modification) if the test fails, but not otherwise. The return value of each test method, if any, is ignored.
-
-## Running a test fixture
-
-The type `testing.unit.TestFixture` defines an instance method `run()`, which lets you run the test fixture on demand. A second overload, `run(silent)`, lets you specify whether or not the test fixture should print the results to the console. By default, it does.
-
-Both overloads of `run` return a list of `testing.unit.FailedTest` instances representing the tests that failed. Each `FailedTest` exposes the following properties:
-
-* `index`: The index of the test within the fixture, zero-based. This index corresponds to the index of the `.` or `F` that is printed.
-* `name`: The name of the test, which is the method name minus the “`test_`” prefix.
-* `error`: The uncaught error that caused the test to fail. This is usually a `testing.unit.AssertionError`, but this is not a guarantee.
-* `fixture`: The test fixture object itself.
-
-Using the `MyClassTests` class defined in the previous example, you would run it on demand like so:
-
-```
-var myClassTests = new MyClassTests();
-var failedTests = myClassTests.run(); // Run and print to console
-// Alternatively:
-failedTests = myClassTests.run(true); // Run and don't print anything
-```
+The part of the test method name following “`test_`” is displayed (without modification) if the test fails, but not otherwise. The return value of each test method, if any, is ignored.
 
 ## Running all test fixtures in a module
 
@@ -99,8 +80,6 @@ TestFixture.runAll(Module.getCurrentModule());
 
 If you have an explicit main method, put the call to `runAll` there instead.
 
-Unlike `run`, the `runAll` method does not return a list of failed tests.
-
 Note that the `runAll` method always prints its results to the console, in the following format:
 
     >> Test fixture name
@@ -108,8 +87,36 @@ Note that the `runAll` method always prints its results to the console, in the f
     >> Test fixture name 2
     .....F...F......FFFFF..
 
-	Failed tests:
-    [Test fixture name #TestIndex: TestName] Error message
-	  Stack trace
+    [Test fixture name: TestName] Failed test error message
+	    Stack trace
 
-Where `.` represents a test that succeeded and `F` is a failed test. When you compile the module with the unit tests, you should probably always compile it with debug symbols enabled (which is the default), to ensure the stack traces will contain the line numbers of the parts of the test that failed.
+Where `.` represents a test that succeeded and `F` is a failed test. When you compile the unit test module, you should probably always compile it with debug symbols enabled (which is the default), to ensure the stack traces will contain the line numbers of the parts of the test that failed.
+
+## Running test fixtures explicitly
+
+If you don't want to run all the tests in a module for any reason, you can use the type `testing.unit.TestRunner`. It has three methods for running unit tests:
+
+* `run`: Takes a single `TestFixture`, or an `aves.reflection.Type` that refers to a type that inherits from `TestFixture`. It runs all the test methods in that test fixture.
+* `runAll`: Takes any number of test fixtures, as described above, and runs all the test methods in all of them.
+* `runAllInModule`: Takes an `aves.reflection.Module` and runs all the test methods of all the test fixture types in it.
+
+All three methods return a list of `testing.unit.TestResult` instances, which contain information about each individual test method that was run.
+
+Once you have your list of `TestResult` values, you can print them to the console using the `testing.unit.TestResultPrinter` and its `printResults` method. This class contains a variety of configurable options; consult the class documentation for more information.
+
+Using the `MyClassTests` class defined in the previous example, you would run it on demand like so:
+
+```
+var testRunner = new TestRunner();
+var myClassTests = new MyClassTests();
+var results = testRunner.run(myClassTests);
+// Alternatively:
+results = testRunner.run(typeof(MyClassTests));
+```
+
+And print the results to the console like so:
+
+```
+var resultPrinter = new TestResultPrinter();
+resultPrinter.printerAll(results);
+```

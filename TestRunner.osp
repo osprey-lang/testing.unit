@@ -1,0 +1,183 @@
+use namespace aves;
+use namespace aves.reflection;
+
+namespace testing.unit;
+
+/// Summary: The {TestRunner} class, as its name suggests, is responsible for
+///          running tests. Specifically, it runs the test methods in one or
+///          more {TestFixture}s.
+///
+///          A test method is a public instance method inside a {TestFixture}
+///          whose name begins with “`test_`”. Test methods are run by being
+///          invoked with zero arguments. The result of each test method is
+///          contained in a {TestResult}.
+public class TestRunner
+{
+	/// Summary: Creates a new {TestRunner}.
+	public new();
+
+	/// Summary: Runs all the tests in a {Module}.
+	/// Param module: The {aves.reflection.Module} to run tests in.
+	/// Returns: A List of {TestResult} values with the result of each test that
+	///          was run. Tests from the same {TestFixture} are adjacent in the
+	///          list.
+	/// Remarks: This method will locate all types declared by the module that
+	///          inherit from {TestFixture}, attempt to instantiate them, and run
+	///          the test methods contained within each one.
+	public runAllInModule(module)
+	{
+		var results = new List(20);
+
+		for testFixture in findTestFixtures(module):
+			runInternal(testFixture, results);
+
+		return results;
+	}
+
+	/// Summary: Runs all test methods in the specified collection of test fixtures.
+	/// Param testFixtures: An iterable value containing the test fixtures to
+	///          run tests of. A test fixture can be represented by a {TestFixture}
+	///          instance, or by an {aves.reflection.Type}. In the latter case,
+	///          the type must inherit from {TestFixture}, and the test runner
+	///          creates an instance of it.
+	/// Returns: A List of {TestResult} values with the result of each test that
+	///          was run. Tests from the same {TestFixture} are adjacent in the
+	///          list.
+	/// Throws ArgumentNullError:
+	///          {testFixtures} is null.
+	/// Throws ArgumentError:
+	///          A value in {testFixtures} is not a {TestFixture} or a {Type}.
+	///
+	///          A value in {testFixtures} is a {Type} that does not inherit from
+	///          {TestFixture}.
+	public runAll(testFixtures)
+	{
+		if testFixtures is null:
+			throw new ArgumentNullError("testFixtures");
+
+		if testFixtures is not Iterable:
+			testFixtures = new ReadOnlyIterable(testFixtures);
+
+		var results = new List(10);
+
+		for testFixture in testFixtures.map(getTestFixture):
+			runInternal(testFixture, results);
+
+		return results;
+	}
+
+	/// Summary: Runs all the tests methods in a single test fixture.
+	/// Param testFixture: A tests fixture to run tests of. A tests fixture can be
+	///          represented by a {TestFixture} instance, or by an {aves.reflection.Type}.
+	///          In the latter case, the type must inherit from {TestFixture}, and
+	///          the test runner creates an instance of it.
+	/// Returns: A List of {TestResult} values with the result of each tests that
+	///          was run.
+	/// Throws ArgumentNullError:
+	///          {testFixture} is null.
+	/// Throws ArgumentError:
+	///          {testFixture} is not a {TestFixture} or a {Type}.
+	///
+	///          {testFixture} is a {Type} that does not inherit from {TestFixture}.
+	public run(testFixture)
+	{
+		testFixture = getTestFixture(testFixture);
+
+		var results = new List(5);
+		runInternal(testFixture, results);
+
+		return results;
+	}
+
+	private runInternal(testFixture, results)
+	{
+		for method in findTestMethods(testFixture)
+		{
+			var result = runTestMethod(testFixture, method);
+			results.add(result);
+		}
+	}
+
+	private runTestMethod(testFixture, method)
+	{
+		var error;
+		// Don't catch errors thrown in setUp or tearDown, but do make
+		// sure tearDown is called if an error is thrown, even if it's
+		// inside setUp.
+		try
+		{
+			testFixture.setUp();
+
+			try
+			{
+				method.invoke(testFixture, null);
+			}
+			catch Error in e
+			{
+				error = e;
+			}
+		}
+		finally
+		{
+			testFixture.tearDown();
+		}
+
+		return new TestResult(
+			testFixture,
+			method,
+			getTestName(method.name),
+			error
+		);
+	}
+
+	private getTestFixture(testFixture)
+	{
+		if testFixture is TestFixture:
+			return testFixture;
+
+		if testFixture is Type and
+			testFixture.inheritsFrom(typeof(TestFixture)):
+			return testFixture.createInstance(null);
+
+		throw new ArgumentError(
+			"The test fixture must be a testing.unit.TestFixture or an aves.reflection.Type that inherits from TestFixture.",
+			"testFixture"
+		);
+	}
+
+	private findTestFixtures(module)
+	{
+		return
+			module.getTypes(typeSearchFlags)
+				.filter(@.inheritsFrom(typeof(TestFixture)))
+				.map(getTestFixture);
+	}
+
+	private findTestMethods(testFixture)
+	{
+		var type = typeof(testFixture);
+
+		return
+			type.getMethods(testMethodSearchFlags)
+				.filter(@.name.startsWith(methodPrefix));
+	}
+
+	private getTestName(methodName)
+	{
+		return methodName.substring(methodPrefix.length);
+	}
+
+	// All test methods must begin with this prefix.
+	private const methodPrefix = "test_";
+
+	// Search flags for locating test fixture types inside a module.
+	private const typeSearchFlags =
+		MemberSearchFlags.isPublic |
+		MemberSearchFlags.isStatic;
+
+	// Search flags for locating test methods inside a test fixture.
+	private const testMethodSearchFlags =
+		MemberSearchFlags.isPublic |
+		MemberSearchFlags.isInstance |
+		MemberSearchFlags.declaredOnly;
+}

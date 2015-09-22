@@ -1,6 +1,5 @@
 use namespace aves;
 use namespace aves.reflection;
-use MSF = aves.reflection.MemberSearchFlags;
 
 namespace testing.unit;
 
@@ -19,7 +18,7 @@ public abstract class TestFixture
 	/// Param name: A display name that summarises the tests in the fixture.
 	public new(name)
 	{
-		_name = name?.toString() ?? defaultName;
+		_name = string(name ?? defaultName);
 	}
 
 	private _name;
@@ -34,160 +33,27 @@ public abstract class TestFixture
 	///          that is called after each run test, even if the test fails.
 	public overridable tearDown() { }
 
-	/// Summary: Runs this test fixture, printing the results to the console.
-	/// Returns: A List containing zero or more {FailedTest} instances.
-	public run()
-	{
-		return run(false);
-	}
-	/// Summary: Runs this test fixture, optionally suppressing the printing
-	///          of results to the console.
-	/// Param silent: If true, no output is printed to the console.
-	public run(silent)
-	{
-		var failedTests = [];
-		runInternal(failedTests, silent);
-		if not silent:
-			printFailedTests(failedTests, false);
-		return failedTests;
-	}
-
-	private runInternal(failedTests, silent)
-	{
-		if not silent:
-			print(">> " :: name);
-
-		// Run all public instance methods whose names begin with "test_",
-		// with zero arguments.
-		var i = 0;
-		try
-		{
-			var type = typeof(this);
-			for method in type.getMethods(MSF.isPublic | MSF.isInstance)
-			{
-				if method.name.startsWith(namePrefix)
-				{
-					var err = runSingleTest(method);
-					if err:
-						failedTests.add(new FailedTest(i, method.name.substring(namePrefix.length), err, this));
-					if not silent
-					{
-						if err
-						{
-							Console.textColor = ConsoleColor.red;
-							Console.write("F");
-						}
-						else
-						{
-							Console.textColor = ConsoleColor.green;
-							Console.write(".");
-						}
-					}
-					i += 1;
-				}
-			}
-		}
-		finally
-		{
-			if not silent:
-				Console.resetColors();
-		}
-		if not silent:
-			Console.writeLine();
-	}
-
-	// Runs a single test method.
-	private runSingleTest(method)
-	{
-		try
-		{
-			// Call setup before each test
-			setUp();
-			try
-			{
-				// Call method on 'this' with zero arguments
-				method.invoke(this, null);
-			}
-			catch Error in e
-			{
-				// Assertion errors are filtered out later
-				return e;
-			}
-		}
-		finally
-		{
-			// Clean up after test
-			tearDown();
-		}
-		return null; // no error
-	}
-
 	/// Summary: Runs all tests fixtures in the specified module. The result of
 	///          the test run is printed to the console.
 	/// Param module: The module to run tests for. (aves.reflection.Module)
+	/// Throws ArgumentNullError:
+	///          {module} is null.
+	/// Throws ArgumentError:
+	///          {module} is not an {aves.reflection.Module}.
 	public static runAll(module)
 	{
+		if module is null:
+			throw new ArgumentNullError("module");
 		if module is not Module:
-			throw new TypeError("module must be an aves.reflection.Module.");
+			throw new ArgumentError("module must be an aves.reflection.Module.", "module");
 
-		var failedTests = [];
+		var runner = new TestRunner();
+		var printer = new TestResultPrinter();
 
-		var testFixtureType = typeof(TestFixture);
-		for type in module.getTypes(MSF.isPublic | MSF.isStatic)
-		{
-			if type.inheritsFrom(testFixtureType)
-			{
-				var fixture;
-				try
-				{
-					fixture = type.createInstance(null);
-				}
-				catch Error in e
-				{
-					print(
-						">> Test fixture initialization error: '{0}': {1}",
-						[type.fullName, e]
-					);
-					next;
-				}
-				fixture.runInternal(failedTests, false);
-			}
-		}
-
-		printFailedTests(failedTests, true);
-	}
-
-	private static printFailedTests(failedTests, includeFixture)
-	{
-		if not failedTests.isEmpty
-		{
-			print("\nFailed tests:");
-			for failure in failedTests
-			{
-				var error = failure.error;
-				var msg = error.message;
-				if error is not AssertionError:
-					msg = typeof(error).fullName :: ": " :: msg;
-				// First print some general information
-				print(
-					includeFixture ? failedTestWithFixtureFormat : failedTestFormat,
-					[failure.index, failure.name, msg, failure.fixture.name]
-				);
-				// Then the stack trace of the "main" error
-				print(error.stackTrace);
-				// Followed by the innerError chain as far as it goes.
-				while error = error.innerError:
-					print("Inner error: " :: error);
-			}
-		}
+		var results = runner.runAllInModule(module);
+		printer.printResults(results);
 	}
 
 	// The default name for a test fixture initialized without a name.
-	private const defaultName = "(unnamed)";
-	// The prefix used for test cases.
-	private const namePrefix = "test_";
-	// 0 = test index; 1 = test name; 2 = failure message
-	private const failedTestFormat = "[{0}: {1}] {2}";
-	// 3 = fixture name
-	private const failedTestWithFixtureFormat = "[{3} #{0}: {1}] {2}";
+	private const defaultName = "(Unnamed test fixture)";
 }

@@ -1,0 +1,76 @@
+use namespace aves;
+use Method = aves.reflection.Method;
+
+namespace testing.unit;
+
+/// Summary: Encapsulates the result of a single test. A {TestResult} contains
+///          the {aves.reflection.Method} that was run as part of the test,
+///          along with the {TestFixture} instance that the test was run on.
+///          If the test failed, the {error} member contains the {Error} that
+///          was thrown to cause it to fail.
+public class TestResult
+{
+	/// Summary: Creates a new successful {TestResult}.
+	/// Param testFixture: The {TestFixture} that the test result comes from.
+	/// Param method: The {Method} that the test result comes from.
+	/// Param name: The name of the test method.
+	/// Throws ArgumentError:
+	///          {testFixture} is not a {TestFixture}.
+	///
+	///          {method} is not an {aves.reflection.Method}.
+	public new(testFixture, method, name)
+	{
+		new this(testFixture, method, name, null);
+	}
+	/// Summary: Creates a new {TestResult} with the specified error data.
+	/// Param testFixture: The {TestFixture} that the test result comes from.
+	/// Param method: The {Method} that the test result comes from.
+	/// Param name: The name of the test method.
+	/// Param error: If the test failed, the {Error} that was thrown to make it
+	///              fail. If the test succeeded, null.
+	/// Throws ArgumentError:
+	///          {testFixture} is not a {TestFixture}.
+	///
+	///          {method} is not an {aves.reflection.Method}.
+	///
+	///          {error} is not an {Error} and not null.
+	public new(testFixture, method, name, error)
+	{
+		if testFixture is not TestFixture:
+			throw new ArgumentError("testFixture must be a testing.unit.TestFixture.", "testFixture");
+		if method is not Method:
+			throw new ArgumentError("method must be an aves.reflection.Method.", "method");
+		name = string(name);
+		if error is not null and error is not Error:
+			throw new ArgumentError("error must be an aves.Error or null.", "error");
+
+		_testFixture = testFixture;
+		_method = method;
+		_name = name;
+		_error = error;
+	}
+
+	private _testFixture;
+	/// Summary: Gets the {TestFixture} that the test result comes from.
+	public get testFixture = _testFixture;
+
+	private _method;
+	/// Summary: Gets the test {Method} that the test result comes from.
+	public get method = _method;
+
+	private _name;
+	/// Summary: Gets the name of the test method, which is generally the method
+	///          name minus the prefix that denotes it as a test.
+	public get name = _name;
+
+	private _error;
+	/// Summary: Gets the {Error} that was thrown to make the test fail. If the
+	///          test succeeded, this property returns null.
+	public get error = _error;
+
+	/// Summary: Determines whether the test succeeded.
+	public get succeeded = _error is null;
+
+	/// Summary: Determines whether the test failed.
+	public get failed = _error is not null;
+}

@@ -1,0 +1,165 @@
+use namespace aves;
+
+namespace testing.unit;
+
+/// Summary: Prints the results of a test run to the console. Various options
+///          can be configured, such as whether to use colored output, what
+///          colors to use, and how to print error details for failed tests.
+public class TestResultPrinter
+{
+	/// Summary: Creates a new {TestResultPrinter}.
+	public new();
+
+	private _useColors = true;
+	/// Summary: Gets a value that determines whether the printer produces
+	///          colored output.
+	public get useColors = _useColors;
+	/// Summary: Sets a value that determines whether the printer produces
+	///          colored output.
+	public set useColors { _useColors = bool(value); }
+
+	private _successColor = ConsoleColor.green;
+	/// Summary: Gets the text color that is used for successful tests, if colored
+	///          output is enabled.
+	/// Returns: A {ConsoleColor} with the text color used for successful tests.
+	///          This color is only used if {useColors} is true.
+	/// Remarks: The initial value is {ConsoleColor.green}.
+	public get successColor = _successColor;
+	/// Summary: Sets the text color that is used for successful tests, if colored
+	///          output is enabled.
+	/// Remarks: The initial value is {ConsoleColor.green}.
+	public set successColor
+	{
+		if value is not ConsoleColor:
+			throw new ArgumentError("The value must be an aves.ConsoleColor.", "value");
+		_successColor = value;
+	}
+
+	private _errorColor = ConsoleColor.red;
+	/// Summary: Gets the text color that is used for failed tests, if colored
+	///          output is enabled.
+	/// Returns: A {ConsoleColor} with the text color used for failed tests. This
+	///          color is only used if {useColors} is true.
+	/// Remarks: The initial value is {ConsoleColor.red}.
+	public get errorColor = _errorColor;
+	/// Summary: Sets the text color that is used for failed tests, if colored
+	///          output is enabled.
+	/// Remarks: The initial value is {ConsoleColor.red}.
+	public set errorColor
+	{
+		if value is not ConsoleColor:
+			throw new ArgumentError("The value must be an aves.ConsoleColor.", "value");
+		_errorColor = value;
+	}
+
+	private _errorLocation = TestResultErrorLocation.last;
+	/// Summary: Gets a value that determines where error information is printed.
+	/// Returns: A {TestResultErrorLocation} that determines where error information
+	///          is printed.
+	/// Remarks: The initial value is {TestResultErrorLocation.last}.
+	public get errorLocation = _errorLocation;
+	/// Summary: Sets a value that determines where error information is printed.
+	/// Remarks: The initial value is {TestResultErrorLocation.last}.
+	public set errorLocation
+	{
+		if value is not TestResultErrorLocation:
+			throw new ArgumentError("The value must be a testing.unit.TestResultErrorLocation.", "value");
+		_errorLocation = errorLocation;
+	}
+
+	/// Summary: Prints one or more {TestResult}s to the console.
+	/// Param results: An iterable value containing one or more {TestResult}
+	///          instances.
+	public printResults(results)
+	{
+		// First, let's group the results by test fixture.
+		var groupedResults = results.group(@.testFixture);
+
+		for group in groupedResults:
+			printGroup(group[0], group[1]);
+
+		if _errorLocation == TestResultErrorLocation.last:
+			printErrorDetails(results.filter(@.failed));
+	}
+
+	private printGroup(testFixture, results)
+	{
+		Console.writeLine(testFixtureFormat, [testFixture.name]);
+
+		try
+		{
+			for result in results
+			{
+				if _useColors:
+					Console.textColor = result.succeeded ? _successColor : _errorColor;
+				Console.write(result.succeeded ? successfulTest : failedTest);
+			}
+		}
+		finally
+		{
+			if _useColors:
+				Console.resetColors();
+		}
+
+		Console.writeLine();
+
+		if _errorLocation == TestResultErrorLocation.afterFixture:
+			printErrorDetails(results.filter(@.failed));
+	}
+
+	private printErrorDetails(results)
+	{
+		for result in results
+		{
+			var message = result.error.message;
+			if result.error is not AssertionError:
+				message = typeof(result.error).fullName :: ": " :: message;
+
+			Console.writeLine();
+			Console.writeLine(errorDetailFormat, [
+				result.testFixture.name,
+				result.name,
+				message
+			]);
+			printStackTrace(result.error);
+		}
+	}
+
+	private printStackTrace(error)
+	{
+		// The stack trace already ends with a newline; don't print an extra one.
+		Console.write(error.stackTrace);
+
+		error = error.innerError;
+		while error is not null
+		{
+			Console.writeLine(innerErrorFormat, [
+				typeof(error).fullName,
+				error.message
+			]);
+			Console.write(error.stackTrace);
+			error = error.innerError;
+		}
+	}
+
+	// {0} = test fixture name.
+	private const testFixtureFormat = ">> {0}";
+	private const successfulTest = ".";
+	private const failedTest = "F";
+	// {0} = test fixture name; {1} = test name; {2} = failure message.
+	private const errorDetailFormat = "[{0}: {1}] {2}";
+	// {0} = type name; {1} = error message.
+	private const innerErrorFormat = "Inner error: {0}: {1}";
+}
+
+public enum TestResultErrorLocation
+{
+	/// Summary: Error details are not printed. The test result will only show
+	///          an “F” for the failed test(s).
+	none = 0,
+	/// Summary: Error details are printed after each test fixture.
+	afterFixture = 1,
+	/// Summary: Error details are printed last, after all the test results have
+	///          been printed.
+	last = 2,
+}

@@ -2,6 +2,7 @@ version 0:1;
 
 use "Assert.osp";
 use "AssertionError.osp";
+use "AssertionMessages.osp";
 use "TestFixture.osp";
 use "TestResult.osp";
 use "TestResultPrinter.osp";

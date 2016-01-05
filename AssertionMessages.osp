@@ -1,0 +1,179 @@
+use namespace aves;
+
+namespace testing.unit;
+
+private static class AssertionMessages
+{
+	public static expectedTrue(value, message)
+	{
+		return "Expected <{0}> to be true: {1}".format([
+			value,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedFalse(value, message)
+	{
+		return "Expected <{0}> to be false: {1}".format([
+			value,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedNull(value, message)
+	{
+		return "Expected <{0}> to be null: {1}".format([
+			value,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedNonNull(value, message)
+	{
+		return "Expected <{0}> not to be null: {1}".format([
+			value,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedEmptyCollection(value, message)
+	{
+		return "Expected collection to be empty; got <{0}>: {1}".format([
+			value,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedNonEmptyCollection(value, message)
+	{
+		return "Expected collection not to be empty; got <{0}>: {1}".format([
+			value,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedValueOfType(value, type, message)
+	{
+		return "Expected <{0}> to be of type <{1}>; was <{2}> instead: {3}".format([
+			value,
+			type.fullName,
+			typeof(value).fullName,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedThrow(expectedType, message)
+	{
+		return "Expected function to throw <{0}>; didn't throw: {1}".format([
+			expectedType.fullName,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedThrowOtherType(expectedType, error, message)
+	{
+		return "Expected function to throw <{0}>; threw <{1}> instead: {2}".format([
+			expectedType.fullName,
+			typeof(error).fullName,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedNotToThrow(error, message)
+	{
+		return "Expected function not to throw; threw <{0}>: {1}".format([
+			typeof(error).fullName,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedEqual(actual, expected, message)
+	{
+		return "Expected <{0}> to equal <{1}>: {2}".format([
+			actual,
+			expected,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedNotEqual(actual, expected, message)
+	{
+		return "Expected <{0}> not to equal <{1}>: {2}".format([
+			actual,
+			expected,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedSameRef(actual, expected, message)
+	{
+		return "Expected <{0}> to be the same reference as <{1}>: {2}".format([
+			actual,
+			expected,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedNotSameRef(actual, expected, message)
+	{
+		return "Expected <{0}> not to be the same reference as <{1}>: {2}".format([
+			actual,
+			expected,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedLess(actual, expected, message)
+	{
+		return "Expected <{0}> to be less than <{1}>: {2}".format([
+			actual,
+			expected,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedLessOrEqual(actual, expected, message)
+	{
+		return "Expected <{0}> to be less than or equal to <{1}>: {2}".format([
+			actual,
+			expected,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedGreater(actual, expected, message)
+	{
+		return "Expected <{0}> to be greater than <{1}>: {2}".format([
+			actual,
+			expected,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedGreaterOrEqual(actual, expected, message)
+	{
+		return "Expected <{0}> to be greater than or equal to <{1}>: {2}".format([
+			actual,
+			expected,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedSameLength(message)
+	{
+		return "Expected the two collections to have the same length: {0}".format([
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public static expectedCollectionMatch(first, second, message)
+	{
+		return "Collection item <{0}> did not match <{1}>: {2}".format([
+			first,
+			second,
+			message ?? defaultFailureMessage,
+		]);
+	}
+
+	public const defaultFailureMessage = "Assertion failed";
+}

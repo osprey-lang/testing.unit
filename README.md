@@ -94,7 +94,7 @@ Where `.` represents a test that succeeded and `F` is a failed test. When you co
 
 ## Running test fixtures explicitly
 
-If you don't want to run all the tests in a module for any reason, you can use the type `testing.unit.TestRunner`. It has three methods for running unit tests:
+If you don't want to just run all the tests in a module for any reason, you can use the type `testing.unit.TestRunner` to run tests manually. It has three methods for running unit tests:
 
 * `run`: Takes a single `TestFixture`, or an `aves.reflection.Type` that refers to a type that inherits from `TestFixture`. It runs all the test methods in that test fixture.
 * `runAll`: Takes any number of test fixtures, as described above, and runs all the test methods in all of them.
@@ -118,5 +118,5 @@ And print the results to the console like so:
 
 ```
 var resultPrinter = new TestResultPrinter();
-resultPrinter.printerAll(results);
+resultPrinter.printResults(results);
 ```

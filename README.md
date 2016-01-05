@@ -18,48 +18,48 @@ namespace my.module.test;
 
 public class MyClassTests is TestFixture
 {
-	public new()
-	{
-		// The TestFixture constructor accepts an optional display name,
-		// which will help you identify the test fixture.
-		new base("Test for MyClass");
-	}
+  public new()
+  {
+    // The TestFixture constructor accepts an optional display name,
+    // which will help you identify the test fixture.
+    new base("Test for MyClass");
+  }
 
-	public test_ConstructionWithNoArguments()
-	{
-		var myClass;
-		// testing.unit.Assert is a helper class
-		Assert.doesNotThrow(@{ myClass = new MyClass(); });
-		Assert.areEqual(myClass.value, 0);
-		// etc.
-	}
+  public test_ConstructionWithNoArguments()
+  {
+    var myClass;
+    // testing.unit.Assert is a helper class
+    Assert.doesNotThrow(@{ myClass = new MyClass(); });
+    Assert.areEqual(myClass.value, 0);
+    // etc.
+  }
 
-	public test_ConstructionWithOneArgument()
-	{
-		var myClass;
-		var value = 123;
-		Assert.doesNotThrow(@{ myClass = new MyClass(value); });
-		Assert.areEqual(myClass.value, value);
-	}
+  public test_ConstructionWithOneArgument()
+  {
+    var myClass;
+    var value = 123;
+    Assert.doesNotThrow(@{ myClass = new MyClass(value); });
+    Assert.areEqual(myClass.value, value);
+  }
 
-	public test_ConstructionWithNegativeArgument()
-	{
-		Assert.throws(typeof(ArgumentRangeError), @= new MyClass(-1));
-	}
+  public test_ConstructionWithNegativeArgument()
+  {
+    Assert.throws(typeof(ArgumentRangeError), @= new MyClass(-1));
+  }
 
-	public test_Equality()
-	{
-		// Assertion errors can be thrown explicitly:
-		var x = new MyClass(1);
-		var y = new MyClass(1);
-		if x != y:
-			throw new AssertionError("MyClass with same value should equal each other.");
+  public test_Equality()
+  {
+    // Assertion errors can be thrown explicitly:
+    var x = new MyClass(1);
+    var y = new MyClass(1);
+    if x != y:
+      throw new AssertionError("MyClass with same value should equal each other.");
 
-		// Usually better:
-		Assert.areEqual(x, y, "MyClass with same value should equal each other.");
-	}
+    // Usually better:
+    Assert.areEqual(x, y, "MyClass with same value should equal each other.");
+  }
 
-	// etc.
+  // etc.
 }
 ```
 
@@ -88,7 +88,7 @@ Note that the `runAll` method always prints its results to the console, in the f
     .....F...F......FFFFF..
 
     [Test fixture name: TestName] Failed test error message
-	    Stack trace
+      Stack trace
 
 Where `.` represents a test that succeeded and `F` is a failed test. When you compile the unit test module, you should probably always compile it with debug symbols enabled (which is the default), to ensure the stack traces will contain the line numbers of the parts of the test that failed.
 

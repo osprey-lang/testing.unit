@@ -11,8 +11,8 @@ To define a test fixture, declare a class that derives from the abstract class `
 Then, define your tests as methods on the test fixture class. Every public instance method whose name begins with “`test_`” is part of the test fixture, and like the constructor, must accept zero arguments. An example follows.
 
 ```
-use namespace aves;
-use namespace testing.unit;
+use aves;
+use testing.unit;
 
 namespace my.module.test;
 
@@ -72,8 +72,8 @@ The class `testing.unit.TestFixture` also has a public static method `runAll`, w
 Running a module full of test fixtures usually involves no more than this bit of code:
 
 ```
-use namespace aves.reflection; // for Module
-use namespace testing.unit;
+use aves.reflection; // for Module
+use testing.unit;
 
 TestFixture.runAll(Module.getCurrentModule());
 ```

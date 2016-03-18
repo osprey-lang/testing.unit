@@ -1,4 +1,4 @@
-use namespace aves;
+use aves;
 use Method = aves.reflection.Method;
 
 namespace testing.unit;

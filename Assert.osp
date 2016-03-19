@@ -1,5 +1,5 @@
-use namespace aves;
-use namespace aves.reflection;
+use aves;
+use aves.reflection;
 
 namespace testing.unit;
 

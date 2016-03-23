@@ -172,12 +172,12 @@ public class TestRunner
 
 	// Search flags for locating test fixture types inside a module.
 	private const typeSearchFlags =
-		MemberSearchFlags.isPublic |
-		MemberSearchFlags.isStatic;
+		MemberSearchFlags.\public |
+		MemberSearchFlags.\static;
 
 	// Search flags for locating test methods inside a test fixture.
 	private const testMethodSearchFlags =
-		MemberSearchFlags.isPublic |
-		MemberSearchFlags.isInstance |
+		MemberSearchFlags.\public |
+		MemberSearchFlags.instance |
 		MemberSearchFlags.declaredOnly;
 }

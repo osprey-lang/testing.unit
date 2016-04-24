@@ -31,7 +31,7 @@ public class TestResultPrinter
 	public set successColor
 	{
 		if value is not ConsoleColor:
-			throw new ArgumentError("The value must be an aves.ConsoleColor.", "value");
+			throw new ArgumentTypeError("value", typeof(ConsoleColor));
 		_successColor = value;
 	}
 
@@ -48,7 +48,7 @@ public class TestResultPrinter
 	public set errorColor
 	{
 		if value is not ConsoleColor:
-			throw new ArgumentError("The value must be an aves.ConsoleColor.", "value");
+			throw new ArgumentTypeError("value", typeof(ConsoleColor));
 		_errorColor = value;
 	}
 
@@ -63,7 +63,7 @@ public class TestResultPrinter
 	public set errorLocation
 	{
 		if value is not TestResultErrorLocation:
-			throw new ArgumentError("The value must be a testing.unit.TestResultErrorLocation.", "value");
+			throw new ArgumentTypeError("value", typeof(TestResultErrorLocation));
 		_errorLocation = errorLocation;
 	}
 

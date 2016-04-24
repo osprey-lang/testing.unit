@@ -95,14 +95,14 @@ public static class Assert
 	/// Param value: The value to test.
 	/// Param type: The type that {value} has to be of. (aves.reflection.Type)
 	/// Returns: True if the assertion succeeds.
-	/// Throws ArgumentError:
+	/// Throws ArgumentTypeError:
 	///          {type} is not an instance of {aves.reflection.Type}.
 	/// Throws AssertionError:
 	///          {value} is not an instance of the type represented by {type}.
 	public static isOfType(value, type, message = null)
 	{
 		if type is not Type:
-			throw new ArgumentError("type must be an aves.reflection.Type instances.", "type");
+			throw new ArgumentTypeError("type", typeof(Type));
 
 		if not typeof(value).inheritsFrom(type):
 			throw new AssertionError(AssertionMessages.expectedValueOfType(value, type, message));
@@ -117,9 +117,10 @@ public static class Assert
 	///             return value is ignored.
 	/// Param message: (optional) A message included in the assertion error message.
 	/// Returns: The error that was thrown, for further inspection if necessary.
+	/// Throws ArgumentTypeError:
+	///          {type} is not an instance of {aves.reflection.Type}.
 	/// Throws ArgumentError:
-	///          {type} is not an instance of {aves.reflection.Type}, or the type represented
-	///          by {type} is not {aves.Error} or a type derived from it.
+	///          {type} does not represent a type derived from {aves.Error}.
 	/// Throws ArgumentNullError:
 	///          {func} is null.
 	/// Throws AssertionError:
@@ -130,7 +131,7 @@ public static class Assert
 	public static throws(type, func, message = null)
 	{
 		if type is not Type:
-			throw new ArgumentError("type must be an aves.reflection.Type instance.", "type");
+			throw new ArgumentTypeError("type", typeof(Type));
 		if not type.inheritsFrom(typeof(Error)):
 			throw new ArgumentError("type must represent aves.Error or a type derived from it.", "type");
 		if func is null:
@@ -146,7 +147,7 @@ public static class Assert
 				AssertionMessages.expectedThrow(type, message),
 				error // innerError
 			);
-		else if not typeof(error).inheritsFrom(type):
+		else if not type.isInstance(error):
 			throw new AssertionError(
 				AssertionMessages.expectedThrowOtherType(type, error, message),
 				error // innerError

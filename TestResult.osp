@@ -14,7 +14,7 @@ public class TestResult
 	/// Param testFixture: The {TestFixture} that the test result comes from.
 	/// Param method: The {Method} that the test result comes from.
 	/// Param name: The name of the test method.
-	/// Throws ArgumentError:
+	/// Throws ArgumentTypeError:
 	///          {testFixture} is not a {TestFixture}.
 	///
 	///          {method} is not an {aves.reflection.Method}.
@@ -28,7 +28,7 @@ public class TestResult
 	/// Param name: The name of the test method.
 	/// Param error: If the test failed, the {Error} that was thrown to make it
 	///              fail. If the test succeeded, null.
-	/// Throws ArgumentError:
+	/// Throws ArgumentTypeError:
 	///          {testFixture} is not a {TestFixture}.
 	///
 	///          {method} is not an {aves.reflection.Method}.
@@ -37,12 +37,12 @@ public class TestResult
 	public new(testFixture, method, name, error)
 	{
 		if testFixture is not TestFixture:
-			throw new ArgumentError("testFixture must be a testing.unit.TestFixture.", "testFixture");
+			throw new ArgumentTypeError("testFixture", typeof(TestFixture));
 		if method is not Method:
-			throw new ArgumentError("method must be an aves.reflection.Method.", "method");
+			throw new ArgumentTypeError("method", typeof(Method));
 		name = string(name);
 		if error is not null and error is not Error:
-			throw new ArgumentError("error must be an aves.Error or null.", "error");
+			throw new ArgumentTypeError("error", typeof(Error));
 
 		_testFixture = testFixture;
 		_method = method;

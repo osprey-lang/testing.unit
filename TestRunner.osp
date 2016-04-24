@@ -45,9 +45,9 @@ public class TestRunner
 	///          list.
 	/// Throws ArgumentNullError:
 	///          {testFixtures} is null.
-	/// Throws ArgumentError:
+	/// Throws ArgumentTypeError:
 	///          A value in {testFixtures} is not a {TestFixture} or a {Type}.
-	///
+	/// Throws ArgumentError:
 	///          A value in {testFixtures} is a {Type} that does not inherit from
 	///          {TestFixture}.
 	public runAll(testFixtures)
@@ -75,9 +75,9 @@ public class TestRunner
 	///          was run.
 	/// Throws ArgumentNullError:
 	///          {testFixture} is null.
-	/// Throws ArgumentError:
+	/// Throws ArgumentTypeError:
 	///          {testFixture} is not a {TestFixture} or a {Type}.
-	///
+	/// Throws ArgumentError:
 	///          {testFixture} is a {Type} that does not inherit from {TestFixture}.
 	public run(testFixture)
 	{
@@ -132,17 +132,21 @@ public class TestRunner
 
 	private getTestFixture(testFixture)
 	{
+		if testFixture is null:
+			throw new ArgumentNullError("testFixture");
+
 		if testFixture is TestFixture:
 			return testFixture;
 
-		if testFixture is Type and
-			testFixture.inheritsFrom(typeof(TestFixture)):
-			return testFixture.createInstance(null);
+		if testFixture is Type
+		{
+			if not testFixture.inheritsFrom(typeof(TestFixture)):
+				throw new ArgumentError("The test fixture type does not inherit from testing.unit.TestFixture.", "testFixture");
 
-		throw new ArgumentError(
-			"The test fixture must be a testing.unit.TestFixture or an aves.reflection.Type that inherits from TestFixture.",
-			"testFixture"
-		);
+			return testFixture.createInstance(null);
+		}
+
+		throw new ArgumentTypeError("testFixture", [typeof(TestFixture), typeof(Type)]);
 	}
 
 	private findTestFixtures(module)

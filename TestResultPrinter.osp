@@ -73,7 +73,7 @@ public class TestResultPrinter
 	public printResults(results)
 	{
 		// First, let's group the results by test fixture.
-		var groupedResults = results.group(@.testFixture);
+		var groupedResults = results.groupBy(@.testFixture);
 
 		for group in groupedResults:
 			printGroup(group[0], group[1]);

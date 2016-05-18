@@ -10,4 +10,4 @@ if not exist "%LIB%\testing.unit\" (
 	mkdir "%LIB%\testing.unit"
 )
 
-%OSPC% /libpath "%LIB%" /type module /out "%LIB%\testing.unit\testing.unit.ovm" /doc "%LIB%\testing.unit\testing.unit.ovm.json" /verbose testing.unit.osp
+%OSPC% /libpath "%LIB%" /type module /out "%LIB%\testing.unit\testing.unit.ovm" /doc "%LIB%\testing.unit\testing.unit.ovm.json" /verbose src\testing.unit.osp

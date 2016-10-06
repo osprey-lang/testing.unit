@@ -1,5 +1,3 @@
-version 0:1;
-
 use "Assert.osp";
 use "AssertionError.osp";
 use "AssertionMessages.osp";

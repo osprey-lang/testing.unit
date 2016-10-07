@@ -2,7 +2,7 @@ use aves;
 
 namespace testing.unit;
 
-private static class AssertionMessages
+internal static class AssertionMessages
 {
 	public static expectedTrue(value, message)
 	{

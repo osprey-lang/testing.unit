@@ -13,7 +13,7 @@ public class TestResultPrinter
 	private _useColors = true;
 	/// Summary: Gets a value that determines whether the printer produces
 	///          colored output.
-	public get useColors = _useColors;
+	public get useColors => _useColors;
 	/// Summary: Sets a value that determines whether the printer produces
 	///          colored output.
 	public set useColors { _useColors = bool(value); }
@@ -24,7 +24,7 @@ public class TestResultPrinter
 	/// Returns: A {ConsoleColor} with the text color used for successful tests.
 	///          This color is only used if {useColors} is true.
 	/// Remarks: The initial value is {ConsoleColor.green}.
-	public get successColor = _successColor;
+	public get successColor => _successColor;
 	/// Summary: Sets the text color that is used for successful tests, if colored
 	///          output is enabled.
 	/// Remarks: The initial value is {ConsoleColor.green}.
@@ -41,7 +41,7 @@ public class TestResultPrinter
 	/// Returns: A {ConsoleColor} with the text color used for failed tests. This
 	///          color is only used if {useColors} is true.
 	/// Remarks: The initial value is {ConsoleColor.red}.
-	public get errorColor = _errorColor;
+	public get errorColor => _errorColor;
 	/// Summary: Sets the text color that is used for failed tests, if colored
 	///          output is enabled.
 	/// Remarks: The initial value is {ConsoleColor.red}.
@@ -57,7 +57,7 @@ public class TestResultPrinter
 	/// Returns: A {TestResultErrorLocation} that determines where error information
 	///          is printed.
 	/// Remarks: The initial value is {TestResultErrorLocation.last}.
-	public get errorLocation = _errorLocation;
+	public get errorLocation => _errorLocation;
 	/// Summary: Sets a value that determines where error information is printed.
 	/// Remarks: The initial value is {TestResultErrorLocation.last}.
 	public set errorLocation

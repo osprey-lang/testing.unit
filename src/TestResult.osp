@@ -52,25 +52,25 @@ public class TestResult
 
 	private _testFixture;
 	/// Summary: Gets the {TestFixture} that the test result comes from.
-	public get testFixture = _testFixture;
+	public get testFixture => _testFixture;
 
 	private _method;
 	/// Summary: Gets the test {Method} that the test result comes from.
-	public get method = _method;
+	public get method => _method;
 
 	private _name;
 	/// Summary: Gets the name of the test method, which is generally the method
 	///          name minus the prefix that denotes it as a test.
-	public get name = _name;
+	public get name => _name;
 
 	private _error;
 	/// Summary: Gets the {Error} that was thrown to make the test fail. If the
 	///          test succeeded, this property returns null.
-	public get error = _error;
+	public get error => _error;
 
 	/// Summary: Determines whether the test succeeded.
-	public get succeeded = _error is null;
+	public get succeeded => _error is null;
 
 	/// Summary: Determines whether the test failed.
-	public get failed = _error is not null;
+	public get failed => _error is not null;
 }

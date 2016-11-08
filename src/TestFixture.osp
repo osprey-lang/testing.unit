@@ -23,7 +23,7 @@ public abstract class TestFixture
 
 	private _name;
 	/// Summary: Gets a display name that summarises the tests in the fixture.
-	public get name = _name;
+	public get name => _name;
 
 	/// Summary: When overridden in a derived class, provides a setup routine
 	///          that is called before each test case.

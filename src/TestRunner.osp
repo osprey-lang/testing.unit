@@ -28,8 +28,9 @@ public class TestRunner
 	{
 		var results = new List(20);
 
-		for testFixture in findTestFixtures(module):
+		for testFixture in findTestFixtures(module) {
 			runInternal(testFixture, results);
+		}
 
 		return results;
 	}
@@ -52,16 +53,19 @@ public class TestRunner
 	///          {TestFixture}.
 	public runAll(testFixtures)
 	{
-		if testFixtures is null:
+		if testFixtures is null {
 			throw new ArgumentNullError("testFixtures");
+		}
 
-		if testFixtures is not Iterable:
+		if testFixtures is not Iterable {
 			testFixtures = new ReadOnlyIterable(testFixtures);
+		}
 
 		var results = new List(10);
 
-		for testFixture in testFixtures.map(getTestFixture):
+		for testFixture in testFixtures.map(getTestFixture) {
 			runInternal(testFixture, results);
+		}
 
 		return results;
 	}
@@ -91,8 +95,7 @@ public class TestRunner
 
 	private runInternal(testFixture, results)
 	{
-		for method in findTestMethods(testFixture)
-		{
+		for method in findTestMethods(testFixture) {
 			var result = runTestMethod(testFixture, method);
 			results.add(result);
 		}
@@ -104,21 +107,17 @@ public class TestRunner
 		// Don't catch errors thrown in setUp or tearDown, but do make
 		// sure tearDown is called if an error is thrown, even if it's
 		// inside setUp.
-		try
-		{
+		try {
 			testFixture.setUp();
 
-			try
-			{
+			try {
 				method.invoke(testFixture, null);
 			}
-			catch Error in e
-			{
+			catch Error in e {
 				error = e;
 			}
 		}
-		finally
-		{
+		finally {
 			testFixture.tearDown();
 		}
 
@@ -132,16 +131,18 @@ public class TestRunner
 
 	private getTestFixture(testFixture)
 	{
-		if testFixture is null:
+		if testFixture is null {
 			throw new ArgumentNullError("testFixture");
+		}
 
-		if testFixture is TestFixture:
+		if testFixture is TestFixture {
 			return testFixture;
+		}
 
-		if testFixture is Type
-		{
-			if not testFixture.inheritsFrom(typeof(TestFixture)):
+		if testFixture is Type {
+			if not testFixture.inheritsFrom(typeof(TestFixture)) {
 				throw new ArgumentError("The test fixture type does not inherit from testing.unit.TestFixture.", "testFixture");
+			}
 
 			return testFixture.createInstance(null);
 		}

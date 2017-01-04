@@ -30,8 +30,9 @@ public class TestResultPrinter
 	/// Remarks: The initial value is {ConsoleColor.green}.
 	public set successColor
 	{
-		if value is not ConsoleColor:
+		if value is not ConsoleColor {
 			throw new ArgumentTypeError("value", typeof(ConsoleColor));
+		}
 		_successColor = value;
 	}
 
@@ -47,8 +48,9 @@ public class TestResultPrinter
 	/// Remarks: The initial value is {ConsoleColor.red}.
 	public set errorColor
 	{
-		if value is not ConsoleColor:
+		if value is not ConsoleColor {
 			throw new ArgumentTypeError("value", typeof(ConsoleColor));
+		}
 		_errorColor = value;
 	}
 
@@ -62,8 +64,9 @@ public class TestResultPrinter
 	/// Remarks: The initial value is {TestResultErrorLocation.last}.
 	public set errorLocation
 	{
-		if value is not TestResultErrorLocation:
+		if value is not TestResultErrorLocation {
 			throw new ArgumentTypeError("value", typeof(TestResultErrorLocation));
+		}
 		_errorLocation = errorLocation;
 	}
 
@@ -75,45 +78,47 @@ public class TestResultPrinter
 		// First, let's group the results by test fixture.
 		var groupedResults = results.groupBy(@.testFixture);
 
-		for group in groupedResults:
+		for group in groupedResults {
 			printGroup(group[0], group[1]);
+		}
 
-		if _errorLocation == TestResultErrorLocation.last:
+		if _errorLocation == TestResultErrorLocation.last {
 			printErrorDetails(results.filter(@.failed));
+		}
 	}
 
 	private printGroup(testFixture, results)
 	{
 		Console.writeLine(testFixtureFormat, [testFixture.name]);
 
-		try
-		{
-			for result in results
-			{
-				if _useColors:
+		try {
+			for result in results {
+				if _useColors {
 					Console.textColor = result.succeeded ? _successColor : _errorColor;
+				}
 				Console.write(result.succeeded ? successfulTest : failedTest);
 			}
 		}
-		finally
-		{
-			if _useColors:
+		finally {
+			if _useColors {
 				Console.resetColors();
+			}
 		}
 
 		Console.writeLine();
 
-		if _errorLocation == TestResultErrorLocation.afterFixture:
+		if _errorLocation == TestResultErrorLocation.afterFixture {
 			printErrorDetails(results.filter(@.failed));
+		}
 	}
 
 	private printErrorDetails(results)
 	{
-		for result in results
-		{
+		for result in results {
 			var message = result.error.message;
-			if result.error is not AssertionError:
+			if result.error is not AssertionError {
 				message = typeof(result.error).fullName :: ": " :: message;
+			}
 
 			Console.writeLine();
 			Console.writeLine(errorDetailFormat, [
@@ -131,8 +136,7 @@ public class TestResultPrinter
 		Console.write(error.stackTrace);
 
 		error = error.innerError;
-		while error is not null
-		{
+		while error is not null {
 			Console.writeLine(innerErrorFormat, [
 				typeof(error).fullName,
 				error.message

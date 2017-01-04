@@ -42,10 +42,12 @@ public abstract class TestFixture
 	///          {module} is not an {aves.reflection.Module}.
 	public static runAll(module)
 	{
-		if module is null:
+		if module is null {
 			throw new ArgumentNullError("module");
-		if module is not Module:
+		}
+		if module is not Module {
 			throw new ArgumentTypeError("module", typeof(Module));
+		}
 
 		var runner = new TestRunner();
 		var printer = new TestResultPrinter();

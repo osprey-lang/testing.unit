@@ -36,13 +36,16 @@ public class TestResult
 	///          {error} is not an {Error} and not null.
 	public new(testFixture, method, name, error)
 	{
-		if testFixture is not TestFixture:
+		if testFixture is not TestFixture {
 			throw new ArgumentTypeError("testFixture", typeof(TestFixture));
-		if method is not Method:
+		}
+		if method is not Method {
 			throw new ArgumentTypeError("method", typeof(Method));
+		}
 		name = string(name);
-		if error is not null and error is not Error:
+		if error is not null and error is not Error {
 			throw new ArgumentTypeError("error", typeof(Error));
+		}
 
 		_testFixture = testFixture;
 		_method = method;

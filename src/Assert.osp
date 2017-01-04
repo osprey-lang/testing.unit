@@ -13,8 +13,9 @@ public static class Assert
 	///          {value} is a falsy value.
 	public static isTrue(value, message = null)
 	{
-		if not value:
+		if not value {
 			throw new AssertionError(AssertionMessages.expectedTrue(value, message));
+		}
 		return true;
 	}
 
@@ -26,8 +27,9 @@ public static class Assert
 	///          {value} is a truthy value.
 	public static isFalse(value, message = null)
 	{
-		if value:
+		if value {
 			throw new AssertionError(AssertionMessages.expectedFalse(value, message));
+		}
 		return true;
 	}
 
@@ -39,8 +41,9 @@ public static class Assert
 	///          {value} is not null.
 	public static isNull(value, message = null)
 	{
-		if value is not null:
+		if value is not null {
 			throw new AssertionError(AssertionMessages.expectedNull(value, message));
+		}
 		return true;
 	}
 
@@ -52,8 +55,9 @@ public static class Assert
 	///          {value} is null.
 	public static isNotNull(value, message = null)
 	{
-		if value is null:
+		if value is null {
 			throw new AssertionError(AssertionMessages.expectedNonNull(value, message));
+		}
 		return true;
 	}
 
@@ -70,8 +74,9 @@ public static class Assert
 	///          property instead of `length`, and cannot be used with this method.
 	public static isEmpty(value, message = null)
 	{
-		if value.length != 0:
+		if value.length != 0 {
 			throw new AssertionError(AssertionMessages.expectedEmptyCollection(value, message));
+		}
 	}
 
 	/// Summary: Verifies that the specified collection is not empty. A collection
@@ -87,8 +92,9 @@ public static class Assert
 	///          property instead of `length`, and cannot be used with this method.
 	public static isNotEmpty(value, message = null)
 	{
-		if value.length == 0:
+		if value.length == 0 {
 			throw new AssertionError(AssertionMessages.expectedNonEmptyCollection(value, message));
+		}
 	}
 
 	/// Summary: Verifies that the specified value is of the specified type.
@@ -101,11 +107,13 @@ public static class Assert
 	///          {value} is not an instance of the type represented by {type}.
 	public static isOfType(value, type, message = null)
 	{
-		if type is not Type:
+		if type is not Type {
 			throw new ArgumentTypeError("type", typeof(Type));
+		}
 
-		if not typeof(value).inheritsFrom(type):
+		if not typeof(value).inheritsFrom(type) {
 			throw new AssertionError(AssertionMessages.expectedValueOfType(value, type, message));
+		}
 
 		return true;
 	}
@@ -130,28 +138,39 @@ public static class Assert
 	///          method with no modification.
 	public static throws(type, func, message = null)
 	{
-		if type is not Type:
+		if type is not Type {
 			throw new ArgumentTypeError("type", typeof(Type));
-		if not type.inheritsFrom(typeof(Error)):
+		}
+		if not type.inheritsFrom(typeof(Error)) {
 			throw new ArgumentError("type must represent aves.Error or a type derived from it.", "type");
-		if func is null:
+		}
+		if func is null {
 			throw new ArgumentNullError("func");
+		}
 
 		var error = null;
-		try { func(); }
-		catch AssertionError { throw; } // Always pass on assertion errors
-		catch Error in e { error = e; }
+		try {
+			func();
+		}
+		catch AssertionError {
+			throw; // Always pass on assertion errors
+		}
+		catch Error in e {
+			error = e;
+		}
 
-		if error is null:
+		if error is null {
 			throw new AssertionError(
 				AssertionMessages.expectedThrow(type, message),
 				error // innerError
 			);
-		else if not type.isInstance(error):
+		}
+		else if not type.isInstance(error) {
 			throw new AssertionError(
 				AssertionMessages.expectedThrowOtherType(type, error, message),
 				error // innerError
 			);
+		}
 		return error;
 	}
 
@@ -169,19 +188,27 @@ public static class Assert
 	///          method with no modification.
 	public static doesNotThrow(func, message = null)
 	{
-		if func is null:
+		if func is null {
 			throw new ArgumentNullError("func");
+		}
 
 		var error = null;
-		try { func(); }
-		catch AssertionError { throw; } // Always pass on assertion errors
-		catch Error in e { error = e; }
+		try {
+			func();
+		}
+		catch AssertionError {
+			throw; // Always pass on assertion errors
+		}
+		catch Error in e {
+			error = e;
+		}
 
-		if error is not null:
+		if error is not null {
 			throw new AssertionError(
 				AssertionMessages.expectedNotToThrow(error, message),
 				error // innerError
 			);
+		}
 		return true;
 	}
 
@@ -195,8 +222,9 @@ public static class Assert
 	///          {actual} is not equal to {expected} according to the `==` operator.
 	public static areEqual(actual, expected, message = null)
 	{
-		if actual != expected:
+		if actual != expected {
 			throw new AssertionError(AssertionMessages.expectedEqual(actual, expected, message));
+		}
 		return true;
 	}
 
@@ -210,8 +238,9 @@ public static class Assert
 	///          {actual} is equal to {expected} according to the `==` operator.
 	public static areNotEqual(actual, expected, message = null)
 	{
-		if actual == expected:
+		if actual == expected {
 			throw new AssertionError(AssertionMessages.expectedNotEqual(actual, expected, message));
+		}
 		return true;
 	}
 
@@ -225,8 +254,9 @@ public static class Assert
 	///          {actual} is not the same reference as {expected}.
 	public static areSameRef(actual, expected, message = null)
 	{
-		if actual not refeq expected:
+		if actual not refeq expected {
 			throw new AssertionError(AssertionMessages.expectedSameRef(actual, expected, message));
+		}
 		return true;
 	}
 
@@ -240,8 +270,9 @@ public static class Assert
 	///          {actual} is the same reference as {expected}.
 	public static areNotSameRef(actual, expected, message = null)
 	{
-		if actual refeq expected:
+		if actual refeq expected {
 			throw new AssertionError(AssertionMessages.expectedNotSameRef(actual, expected, message));
+		}
 		return true;
 	}
 
@@ -255,8 +286,9 @@ public static class Assert
 	///          {actual} is not less than {expected}.
 	public static isLess(actual, expected, message = null)
 	{
-		if not (actual < expected):
+		if not (actual < expected) {
 			throw new AssertionError(AssertionMessages.expectedLess(actual, expected, message));
+		}
 		return true;
 	}
 
@@ -271,8 +303,9 @@ public static class Assert
 	///          {actual} is not less than nor equal to {expected}.
 	public static isLessOrEqual(actual, expected, message = null)
 	{
-		if not (actual <= expected):
+		if not (actual <= expected) {
 			throw new AssertionError(AssertionMessages.expectedLessOrEqual(actual, expected, message));
+		}
 		return true;
 	}
 
@@ -286,8 +319,9 @@ public static class Assert
 	///          {actual} is not greater than {expected}.
 	public static isGreater(actual, expected, message = null)
 	{
-		if not (actual > expected):
+		if not (actual > expected) {
 			throw new AssertionError(AssertionMessages.expectedGreater(actual, expected, message));
+		}
 		return true;
 	}
 
@@ -302,8 +336,9 @@ public static class Assert
 	///          {actual} is not greater than nor equal to {expected}.
 	public static isGreaterOrEqual(actual, expected, message = null)
 	{
-		if not (actual >= expected):
+		if not (actual >= expected) {
 			throw new AssertionError(AssertionMessages.expectedGreaterOrEqual(actual, expected, message));
+		}
 		return true;
 	}
 
@@ -339,24 +374,26 @@ public static class Assert
 		var firstIter = first.iter;
 		var secondIter = second.iter;
 
-		while true
-		{
+		while true {
 			var firstHasMore = firstIter.moveNext();
 			var secondHasMore = secondIter.moveNext();
-			if firstHasMore != secondHasMore:
+			if firstHasMore != secondHasMore {
 				throw new AssertionError(AssertionMessages.expectedSameLength(message));
+			}
 
 			// firstHasMore == secondHasMore here
-			if not firstHasMore:
+			if not firstHasMore {
 				break;
+			}
 
 			var match = comparer(firstIter.current, secondIter.current);
-			if not match:
+			if not match {
 				throw new AssertionError(AssertionMessages.expectedCollectionMatch(
 					firstIter.current,
 					secondIter.current,
 					message
 				));
+			}
 		}
 
 		return true;

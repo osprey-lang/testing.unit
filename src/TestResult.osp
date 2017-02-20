@@ -1,5 +1,5 @@
-use aves;
-use Method = aves.reflection.Method;
+use aves.*;
+use aves.reflection.Method;
 
 namespace testing.unit;
 

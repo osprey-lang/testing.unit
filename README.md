@@ -11,8 +11,8 @@ To define a test fixture, declare a class that derives from the abstract class `
 Then, define your tests as methods on the test fixture class. Every public instance method whose name begins with “`test_`” is part of the test fixture, and like the constructor, must accept zero arguments. An example follows.
 
 ```
-use aves;
-use testing.unit;
+use aves.*;
+use testing.unit.*;
 
 namespace my.module.test;
 
@@ -27,24 +27,22 @@ public class MyClassTests is TestFixture
 
   public test_ConstructionWithNoArguments()
   {
-    var myClass;
+    var myClass = new MyClass();
     // testing.unit.Assert is a helper class
-    Assert.doesNotThrow(@{ myClass = new MyClass(); });
     Assert.areEqual(myClass.value, 0);
     // etc.
   }
 
   public test_ConstructionWithOneArgument()
   {
-    var myClass;
     var value = 123;
-    Assert.doesNotThrow(@{ myClass = new MyClass(value); });
+    var myClass = new MyClass(value);
     Assert.areEqual(myClass.value, value);
   }
 
   public test_ConstructionWithNegativeArgument()
   {
-    Assert.throws(typeof(ArgumentRangeError), @= new MyClass(-1));
+    Assert.throws(typeof(ArgumentRangeError), @=> new MyClass(-1));
   }
 
   public test_Equality()
@@ -52,8 +50,9 @@ public class MyClassTests is TestFixture
     // Assertion errors can be thrown explicitly:
     var x = new MyClass(1);
     var y = new MyClass(1);
-    if x != y:
+    if x != y {
       throw new AssertionError("MyClass with same value should equal each other.");
+    }
 
     // Usually better:
     Assert.areEqual(x, y, "MyClass with same value should equal each other.");
@@ -72,8 +71,8 @@ The class `testing.unit.TestFixture` also has a public static method `runAll`, w
 Running a module full of test fixtures usually involves no more than this bit of code:
 
 ```
-use aves.reflection; // for Module
-use testing.unit;
+use aves.reflection.Module;
+use testing.unit.TestFixture;
 
 TestFixture.runAll(Module.getCurrentModule());
 ```

@@ -74,7 +74,9 @@ Running a module full of test fixtures usually involves no more than this bit of
 use aves.reflection.Module;
 use testing.unit.TestFixture;
 
-TestFixture.runAll(Module.getCurrentModule());
+internal main() {
+  TestFixture.runAll(Module.getCurrentModule());
+}
 ```
 
 If you have an explicit main method, put the call to `runAll` there instead.

@@ -174,44 +174,6 @@ public static class Assert
 		return error;
 	}
 
-	/// Summary: Verifies that the specified function or callback does not throw
-	///          an error.
-	/// Param func: An invokable value that is called with zero arguments. The
-	///             return value is ignored.
-	/// Param message: (optional) A message included in the assertion error message.
-	/// Returns: True if the assertion succeeds.
-	/// Throws ArgumentNullError:
-	///          {func} is null.
-	/// Throws AssertionError:
-	///          {func} threw an error when invoked with zero arguments.
-	/// Remarks: If {func} throws an {AssertionError}, it is passed to the caller of this
-	///          method with no modification.
-	public static doesNotThrow(func, message = null)
-	{
-		if func is null {
-			throw new ArgumentNullError("func");
-		}
-
-		var error = null;
-		try {
-			func();
-		}
-		catch AssertionError {
-			throw; // Always pass on assertion errors
-		}
-		catch Error in e {
-			error = e;
-		}
-
-		if error is not null {
-			throw new AssertionError(
-				AssertionMessages.expectedNotToThrow(error, message),
-				error // innerError
-			);
-		}
-		return true;
-	}
-
 	/// Summary: Verifies that two values are equal. The two values are considered equal
 	///          if {actual}’s operator `==` returns true.
 	/// Param actual:   The actual value.
